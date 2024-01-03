@@ -40,6 +40,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> GrassHexTile;
 
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
+	TSubclassOf<AHexTile> RockHexTile;
+
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
+	TSubclassOf<AHexTile> DirtHexTile;
+
 
 public:	
 	// Sets default values for this actor's properties
