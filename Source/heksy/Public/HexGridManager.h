@@ -23,10 +23,10 @@ class HEKSY_API AHexGridManager : public AActor
 	void SpawnTiles();
 
 	bool IsRowOdd(const int32 y);
-	bool IsTileSentinel(const int32 x, const int32 y);
+	bool IsTileSentinel(const int32 x, const int32 y, bool bOddRow);
 	float GetXTilePos(const bool bIsRowOdd, const int32 x);
 	float GetYTilePos(const int32 y);
-	TSubclassOf<AHexTile> GetTileToSpawn(x, y);
+	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 
 protected:
