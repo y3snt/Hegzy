@@ -59,7 +59,7 @@ void AHexGridManager::SpawnTiles() {
 			if (x == GridWidth - 1 && oddRow)  // makes the map symetric
 				continue;
 			
-			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y), 
+			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y, oddRow),
 																	FVector(FIntPoint(GetXTilePos(oddRow, x), GetYTilePos(y))), 
 																	FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);
@@ -73,12 +73,12 @@ bool AHexGridManager::IsRowOdd(const int32 y)
 	return y % 2 == 0;  // Sentinel Rows add aditional row
 }
 
-bool AHexGridManager::IsTileSentinel(const int32 x, const int32 y)
+bool AHexGridManager::IsTileSentinel(const int32 x, const int32 y, bool bOddRow)
 {
 	return y == 0						   // first row
 		   || y == GridHeight - 1		   // last row
 		   || x == 0					   // first column
-		   || x == GridWidth - 2 && oddRow // last odd column
+		   || x == GridWidth - 2 && bOddRow // last odd column
 		   || x == GridWidth - 1;		   // last even column
 }
 
@@ -92,18 +92,18 @@ float AHexGridManager::GetYTilePos(const int32 y)
 	return y * TileVerticalOffset;
 }
 
-TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(x, y)
+TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32 y, bool bOddRow)
 {
 	TSubclassOf<AHexTile> TileToSpawn = DirtHexTile;  // Default Tile
 
-	if (IsTileSentinel(x, y)) {
+	if (IsTileSentinel(x, y, bOddRow)) {
 		TileToSpawn = SentinelHexTile;
 	}
 	else if (x == 1) // first column
 	{
 		TileToSpawn = GrassHexTile;
 	}
-	else if (x == GridWidth - 3 && oddRow || (x == GridWidth - 2) // last column
+	else if (x == GridWidth - 3 && bOddRow || x == GridWidth - 2) // last column
 	{
 		TileToSpawn = RockHexTile;
 	}
