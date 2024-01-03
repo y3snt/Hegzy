@@ -27,14 +27,29 @@ void AHexGridManager::BeginPlay()
 		for (int32 x = 0; x < GridWidth; x++)
 		{
 			const bool oddRow = y % 2 == 1;
-			if (x == GridWidth && oddRow)
+			if (x == GridWidth - 1 && oddRow)
 			{
 				continue;
 			}
 			const float xPos = oddRow ? (x * TileHorizontalOffset) + OddRowHorizontalOffset : x * TileHorizontalOffset;
 			const float yPos = y * TileVerticalOffset;
 
-			TSubclassOf<AHexTile> tileToSpawn = GrassHexTile;
+			TSubclassOf<AHexTile> tileToSpawn = DirtHexTile;
+			if (x == 0)
+			{
+				tileToSpawn = GrassHexTile;
+			}
+			else if (x == GridWidth - 2 && oddRow)
+			{
+				tileToSpawn = RockHexTile;
+			}
+			else if (x == GridWidth - 1)
+			{
+				tileToSpawn = RockHexTile;
+			}
+			
+
+
 			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(tileToSpawn, FVector(FIntPoint(xPos, yPos)), FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);
 		}
