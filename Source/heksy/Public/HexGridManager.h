@@ -16,6 +16,17 @@ class HEKSY_API AHexGridManager : public AActor
 {
 	GENERATED_BODY()
 
+	void BlueprintsCheck();  // stops the program if the properties aren't setup
+
+	void AdjustGridSize();
+	void InitHexGridArray();
+	void SpawnTiles();
+
+	bool IsRowOdd(const int32 y);
+	bool IsTileSentinel(const int32 x, const int32 y);
+	float GetXTilePos(const bool bIsRowOdd, const int32 x);
+	float GetYTilePos(const int32 y);
+	TSubclassOf<AHexTile> GetTileToSpawn(x, y);
 
 
 protected:
@@ -26,7 +37,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
 	int32 GridHeight;  // no tiles horizonally vertically
-
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
 	float OddRowHorizontalOffset;
@@ -49,16 +59,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> SentinelHexTile;
 
-private:
-	void blueprintsCheck();  // stops the program if the properties aren't setup
-
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;   // __ why virtual and override??
 
 public:	
 	// Sets default values for this actor's properties
 	AHexGridManager();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;   // __ why virtual and override??
-
 };

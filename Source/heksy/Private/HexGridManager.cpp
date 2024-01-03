@@ -4,30 +4,16 @@
 #include "HexGridManager.h"
 
 // Sets default values
-AHexGridManager::AHexGridManager()
-{
- 	
-
-}
-
-
-void AHexGridManager::blueprintsCheck()
-{
-	checkf(GrassHexTile != NULL, TEXT("no GrassHexTile"));
-	checkf(DirtHexTile != NULL, TEXT("no DirtHexTile"));
-	checkf(RockHexTile != NULL, TEXT("no RockHexTile"));
-	checkf(SentinelHexTile != NULL, TEXT("no SentinelHexTile"));	
-}
-
+AHexGridManager::AHexGridManager() {}
 
 // Called when the game starts or when spawned
 void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
+	BlueprintsCheck();
 
 	// "+2" is to reserve space for sentinel tiles on each side of the board
-	GridWidth += 2;
-	GridHeight += 2;
+	AdjustGridSize();
 
 	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
@@ -35,96 +21,92 @@ void AHexGridManager::BeginPlay()
 				GridWidth), true);
 	*/
 
+	InitHexGridArray();
+	SpawnTiles();
+	
+}
+
+void AHexGridManager::BlueprintsCheck()
+{
+	checkf(GrassHexTile != NULL, TEXT("no GrassHexTile"));
+	checkf(DirtHexTile != NULL, TEXT("no DirtHexTile"));
+	checkf(RockHexTile != NULL, TEXT("no RockHexTile"));
+	checkf(SentinelHexTile != NULL, TEXT("no SentinelHexTile"));	
+}
+
+void AHexGridManager::AdjustGridSize() 
+{
+	GridWidth += 2;  // TODO: BorderSize * 2
+	GridHeight += 2;
+}
+
+void AHexGridManager::InitHexGridArray() 
+{
 	HexGrid2DArray.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
 	for (int32 i = 0; i < HexGrid2DArray.Num(); i++)
 	{
 		HexGrid2DArray[i].SetNumZeroed(GridHeight);  
 		//std::cout << "siema";
 	}
-
-	for (int32 y = 0; y < GridHeight; y++)
-	{
-		for (int32 x = 0; x < GridWidth; x++)
-		{
-			const bool oddRow = y % 2 == 0;  // Sentinel Rows add aditional row
-			if (x == GridWidth - 1 && oddRow)  // makes the map symetric
-			{
-				continue;
-			}
-			
-			TSubclassOf<AHexTile> tileToSpawn = DirtHexTile;  // Default Tile
-
-			if (y == 0)  // bottom row
-			{
-				tileToSpawn = SentinelHexTile;
-			}
-			else if (y == GridHeight - 1)  // top row
-			{
-				tileToSpawn = SentinelHexTile;
-			}
-			else if (x == 0)  // first column
-			{
-				tileToSpawn = SentinelHexTile;
-			}
-			else if (x == GridWidth - 2 && oddRow)    // last odd column
-			{
-				tileToSpawn = SentinelHexTile;
-			}
-			else if (x == GridWidth - 1)  // last even column
-			{
-				tileToSpawn = SentinelHexTile;
-			}
-
-
-			else if (x == 1) // first column
-			{
-				tileToSpawn = GrassHexTile;
-			}
-			else if (x == GridWidth - 3 && oddRow) // last odd column
-			{
-				tileToSpawn = RockHexTile;
-			}
-			else if (x == GridWidth - 2) // last even column
-			{
-				tileToSpawn = RockHexTile;
-			}
-			
-			
-			const float xPos = oddRow ? (x * TileHorizontalOffset) + OddRowHorizontalOffset : x * TileHorizontalOffset;
-			const float yPos = y * TileVerticalOffset;
-
-			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(tileToSpawn, FVector(FIntPoint(xPos, yPos)), FRotator::ZeroRotator);
-			newTile->TileIndex = FIntPoint(x, y);
-		}
-
-	}
-
-	/*
-	* 	Super::BeginPlay();
-	
-	HexGrid2DArray.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
-	for (int32 i = 0; i < HexGrid2DArray.Num(); i++)
-	{
-		HexGrid2DArray[i].SetNumZeroed(GridHeight);
-		//std::cout << "siema";
-	}
-
-	for (int32 y = 0; y < GridHeight; y++)
-	{
-		for (int32 x = 0; x < GridWidth; x++)
-		{
-			const bool oddRow = y % 2 == 1;
-			const float xPos = oddRow ? (x * TileHorizontalOffset) + OddRowHorizontalOffset : x * TileHorizontalOffset;
-			const float yPos = y * TileVerticalOffset;
-
-			TSubclassOf<AHexTile> tileToSpawn = GrassHexTile;
-			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(tileToSpawn, FVector(FIntPoint(xPos, yPos)), FRotator::ZeroRotator);
-			newTile->TileIndex = FIntPoint(x, y);
-		}
-
-	}
-	*/
 }
 
+void AHexGridManager::SpawnTiles() {
+	for (int32 y = 0; y < GridHeight; y++)
+	{
+		for (int32 x = 0; x < GridWidth; x++)
+		{
+			const bool oddRow = IsRowOdd(y);
+			if (x == GridWidth - 1 && oddRow)  // makes the map symetric
+				continue;
+			
+			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y), 
+																	FVector(FIntPoint(GetXTilePos(oddRow, x), GetYTilePos(y))), 
+																	FRotator::ZeroRotator);
+			newTile->TileIndex = FIntPoint(x, y);
+		}
 
+	}
+}
 
+bool AHexGridManager::IsRowOdd(const int32 y) 
+{
+	return y % 2 == 0;  // Sentinel Rows add aditional row
+}
+
+bool AHexGridManager::IsTileSentinel(const int32 x, const int32 y)
+{
+	return y == 0						   // first row
+		   || y == GridHeight - 1		   // last row
+		   || x == 0					   // first column
+		   || x == GridWidth - 2 && oddRow // last odd column
+		   || x == GridWidth - 1;		   // last even column
+}
+
+float AHexGridManager::GetXTilePos(const bool bIsRowOdd, const int32 x)
+{
+	return bIsRowOdd ? (x * TileHorizontalOffset) + OddRowHorizontalOffset : x * TileHorizontalOffset;
+}
+
+float AHexGridManager::GetYTilePos(const int32 y) 
+{
+	return y * TileVerticalOffset;
+}
+
+TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(x, y)
+{
+	TSubclassOf<AHexTile> TileToSpawn = DirtHexTile;  // Default Tile
+
+	if (IsTileSentinel(x, y)) {
+		TileToSpawn = SentinelHexTile;
+	}
+	else if (x == 1) // first column
+	{
+		TileToSpawn = GrassHexTile;
+	}
+	else if (x == GridWidth - 3 && oddRow || (x == GridWidth - 2) // last column
+	{
+		TileToSpawn = RockHexTile;
+	}
+
+	return TileToSpawn;
+}
