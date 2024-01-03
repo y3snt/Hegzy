@@ -46,6 +46,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> DirtHexTile;
 
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
+	TSubclassOf<AHexTile> SentinelHexTile;
+
+private:
+	void blueprintsCheck();  // stops the program if the properties aren't setup
+
 
 public:	
 	// Sets default values for this actor's properties
