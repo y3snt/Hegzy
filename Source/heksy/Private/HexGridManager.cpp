@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include <iostream>
 #include "HexGridManager.h"
 
 // Sets default values
@@ -46,7 +45,6 @@ void AHexGridManager::InitHexGridArray()
 	for (int32 i = 0; i < HexGrid2DArray.Num(); i++)
 	{
 		HexGrid2DArray[i].SetNumZeroed(GridHeight);  
-		//std::cout << "siema";
 	}
 }
 
