@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 
 #include "HexTile.h"
+#include "Unit.h"
+
 
 #include "HexGridManager.generated.h"
 
@@ -17,26 +19,28 @@ class HEKSY_API AHexGridManager : public AActor
 	GENERATED_BODY()
 
 	void BlueprintsCheck();  // stops the program if the properties aren't setup
-
-	void AdjustGridSize();
 	void InitHexGridArray();
 	void SpawnTiles();
 
+	void AdjustGridSize();
 	bool IsRowOdd(const int32 y);
-	bool IsTileSentinel(const int32 x, const int32 y, bool bOddRow);
-	float GetXTilePos(const bool bIsRowOdd, const int32 x);
+	bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
+	float GetXTilePos(const int32 x, const int32 y);
 	float GetYTilePos(const int32 y);
 	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 
 protected:
 	TArray<TArray<AHexTile*>> HexGrid2DArray;  // pointers to hex objects / tiles
+	TArray<TArray<AUnit*>> UnitGrid2DArray;  // pointers to units on hex grid
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")   // __ ? we can change the value of a blueprint later
 	int32 GridWidth;   // no tiles horizonally
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
 	int32 GridHeight;  // no tiles horizonally vertically
+
+	int32 BorderSize;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
 	float OddRowHorizontalOffset;
@@ -48,13 +52,13 @@ protected:
 	float TileVerticalOffset;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> GrassHexTile;
+	TSubclassOf<AHexTile> AttackerHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> RockHexTile;
+	TSubclassOf<AHexTile> DefenderHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> DirtHexTile;
+	TSubclassOf<AHexTile> DefaultHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> SentinelHexTile;
