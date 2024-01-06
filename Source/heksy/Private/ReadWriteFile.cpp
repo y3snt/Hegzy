@@ -50,3 +50,16 @@ void UReadWriteFile::WriteStringToFile(FString FilePath, FString String, bool& b
 	OutInfoMessage = FString::Printf(TEXT("Write String To File Succeeded - '%s'"), *FilePath);
 }
 
+
+
+
+
+
+void UReadWriteFile::InputConnectListener(FIntPoint Cord, AGameplayManager *Manager, bool& bOutSuccess, FString& OutInfoMessage)
+{
+    
+    Manager->InputListener(Cord);
+    
+    bOutSuccess = true;
+    OutInfoMessage = FString::Printf(TEXT("Pass Cord To Gameplay Manager Succeeded"));
+}

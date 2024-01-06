@@ -16,4 +16,237 @@ void ASymbol::BeginPlay()
 	
 }
 
+#pragma region ComponentTheory
+/*
+IActionable, IPasive, 
 
+class Sword : IActionable
+	Action()
+
+
+#include damage
+#include 
+class Abc : IActive, IReactive
+	Action()
+		damage.effect1
+		effect2
+		
+	Reaction()
+		effect3
+		effect4
+
+
+#include damage
+
+Plik Symbole:
+
+
+
+
+Symbol mieczotarcza = new Symbol([damage.effect1, effect2, ..])
+print(mieczotarcza.tags)
+
+
+Unit:
+	Symbole:
+		Efekty:
+			SubEfekty:
+	
+
+
+
+*/
+
+// ==== Symbole DEMO =====
+/*	
+W?ócznia
+	Action()
+	PassiveAction()
+
+Sword
+	Action()
+		logic - ex with Effects
+
+sword.Action(Cord);
+	
+Shield
+	Reaction()
+
+?uk
+	Action()
+	
+Odepchni?cie
+	Action()
+
+
+
+Action() - will be used in Unit
+
+Unit::Action()  /// OLD FUNCTION
+	foreach (i, symbol) : symbols
+		if symbol isInstance(IActionable)
+			cord ActionCord = CurrentCord + direction(i)  // or iCord, where i will be converted to direction, so dir[i]
+			symbol.Action(CurrentCord)   // current cord - the cord on  | or adjCord - on which the action will be executed - probably better
+
+
+PassiveAction() - will be used in GameManager
+
+
+TileArray
+Grid
+*/
+
+
+// ==== Sub Efekty ====
+/* 
+
+Melee - dzia?a na polu obok
+//Rzut(dystans) - dzia?a na polu obok nas oddalonym o DYSTANS
+Zasi?gowy(zasi?g) - dzia?a na pierwszego napotkanego przeciwnika w zakresie ZASI?G
+//Pocisk(zasi?g) - dzia?a na pierwsz? napotkan? jednotk? w zakresie ZASI?G
+
+//Friendly_Fire_Damage - deal damage to a tile
+Normal_Damage - deal damage to a tile only if it's an enemy
+
+Damage_block - if damage applied came from that direction, ignore it
+
+Push(power) - moves a unit, if the tile it moves to is occupied or illegal. unit dies
+
+
+
+*/
+
+
+
+
+#pragma endregion 
+
+
+#pragma region Gameplay Management
+
+// 	=== ENTRY POINT ===
+/* 
+
+GameInput::Tick()
+	if LeftMouseClick -> Tile:  // + map tile to tileCord
+		// Cord SelectedTile = MapMousePosToCord()
+		GameManager::Listener(Tile)
+		GameVisuals::Highlight(Tile)
+
+
+*/
+
+//== = GAMEMANAGER ==== =
+/*
+PlayerTurn = Enum.Player1;
+Cord LastInput = null;  // ?? is it needed
+
+// Unit *CurrentSelectedUnit = nullptr; //unitjakis  TODO: check if shared_ptr is needed
+Unit &CurrentSelectedUnit = null;  // this must be pointer if we want null
+
+GameManager::SwitchPlayerTurn()
+	PlayerTurn = (PlayerTurn == Enum.Player1) ? Enum.Player2 : Enum.Player1;
+
+GameManager::Listener(Cord)
+
+	if IsFriendlyUnitOn(Cord):  // wybor jednostki
+		LastInput = Cord
+		CurrrentSelectedUnit = &UnitsArray[Cord];  // ? pass by reference
+
+	elif CurrrentSelectedUnit != null && IsLegalMove(Cord):   // or just CurrentSelectedUnit
+		CurrrentSelectedUnit.Move(Cord)
+
+		CurrrentSelectedUnit = null
+		GameManager::SwitchPlayerTurn()
+		
+
+GameManager::IsLegalMove(Cord)   // if pushed: check if not legal move => destroy
+	if IsFriendlyUnitOnCord(Cord) || HexGridManager.IsTileSentinel(Cord)
+		return false;
+	
+	return true;
+
+GameManager::CheckPositions(Cord)
+	for neighbour(q, r) : neighbours(Cord)
+		if Units[q][r] != null:  // How nulls work in unreal arrays??
+
+
+bool GameManager::IsUnitOnCord(Cord)
+	return Units[q][r] != null
+
+bool GameManager::IsEnemyUnitOnCord(Cord)
+	retrun IsUnitOnCord(Cord) && Units[q][r].Owner != PlayerTurn;
+
+
+bool GameManager::IsFriendlyUnitOnCord(Cord)
+	retrun IsUnitOnCord(Cord) && Units[q][r].Owner == PlayerTurn;
+
+
+
+*/
+
+// arr[q][r] zawiera Cord(q, r)
+
+//==== UNIT ====
+/* 
+
+Unit {
+	Cord CurrentCord = null;
+}
+
+Unit::Move(EndCord)
+	int new_direction = Neighbor.find(EndCord - CurrentCord)  // get direction  ? why neighbour.find
+	Rotate(new_direction)
+	if shields: // maybe check for every unit
+		SendMoveEvent(CurrentCord) -> GameMG spr czy nie giniemy
+
+	Action(CurrentCord)
+
+
+	TransformPosition(EndCord) // change CurrentCord
+	SendMoveEvent(CurrentCord)
+	Action(CurrentCord)
+
+
+
+
+Unit::Rotate(x)
+	Cord Directions[6]  // 6 different hex locations in regards of our won
+	int Rotation = x // 0-5 number
+	model.rotation = 45 * x // + naszeustawienie_hexow;
+	0 - przod
+1 - prawy_przod
+2 - prawy tyl
+3 - tyl
+4 - lewy tyl
+5 - lewy przod
+
+Unit::Action():
+	for i, symbol in enumarate(Symbols[6]):
+		if symbol is activatable:
+			Cord AdjCord = current_cord + direction[i - rotation];
+			symbol.action(AdjCord)
+
+*/
+
+#pragma endregion
+
+
+
+
+
+#pragma region Small Scripts
+// == = AXIAL CORDINATE SYSTEM == =
+/*
+
+unit get_stuff(x, y)
+	x += najmniejsza_wartosc_w_arreyu
+	return array[x, y]
+
+
+
+
+
+*/
+
+#pragma endregion

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "GameplayManager.h"
+
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ReadWriteFile.generated.h"
@@ -45,4 +47,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "test|1 - Read Write File")
 	static void WriteStringToFile(FString FilePath, FString String, bool& bOutSuccess, FString& OutInfoMessage);
 
+
+
+	
+	UFUNCTION(BlueprintCallable, Category = "test|1 - Read Write File")
+	static void InputConnectListener(FIntPoint Cord, AGameplayManager *Manager, bool& bOutSuccess, FString& OutInfoMessage);
+
+
+	
 };

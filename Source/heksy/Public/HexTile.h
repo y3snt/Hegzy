@@ -8,7 +8,7 @@
 
 class UStaticMeshComponent;
 
-
+/*
 UENUM()
 enum class EHexTileType : uint8  // __ why uint?
 {
@@ -17,19 +17,20 @@ enum class EHexTileType : uint8  // __ why uint?
 	WATER,
 	MAX UMETA(Hidden)  // __ ???
 };
-
+*/
 UCLASS()  // __ ???
 class HEKSY_API AHexTile : public AActor   // __ why HEKSY_API 
 {
 	GENERATED_BODY()   // __ ???
 
 public:
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile")
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile")
 	FIntPoint TileIndex;
 
+
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")  // U: property, that will be visible in the editor
-	EHexTileType TileType;   // logical tile type
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")  // U: property, that will be visible in the editor
+	//EHexTileType TileType;   // logical tile type
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	UStaticMeshComponent *TileMesh;  // U: visible mesh
