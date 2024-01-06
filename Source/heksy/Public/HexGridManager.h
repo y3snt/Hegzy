@@ -12,6 +12,16 @@
 #include "HexGridManager.generated.h"
 
 
+UENUM()
+enum class EHexTileType : uint8  // __ why uint?
+{
+	INVALID,
+	SENTINEL,   
+	ATTACKER,
+	DEFENDER,
+	DEFAULT,
+	MAX UMETA(Hidden)  // __ ???
+};
 
 UCLASS()
 class HEKSY_API AHexGridManager : public AActor
@@ -29,10 +39,24 @@ class HEKSY_API AHexGridManager : public AActor
 	float GetYTilePos(const int32 y);
 	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
+public:
+	void GenerateGrid();
+	TArray<AHexTile*> DefenderTiles;
+	TArray<AHexTile*> AttackerTiles;
+	TArray<TArray<AUnit*>> UnitGrid2DArray;  // pointers to units on hex grid
+	TArray<TArray<AHexTile*>> HexGrid2DArray;  // pointers to hex objects / tiles
+
+
+private:
+	EHexTileType current_spawn;
+
 
 protected:
-	TArray<TArray<AHexTile*>> HexGrid2DArray;  // pointers to hex objects / tiles
-	TArray<TArray<AUnit*>> UnitGrid2DArray;  // pointers to units on hex grid
+	
+	
+
+
+	
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")   // __ ? we can change the value of a blueprint later
 	int32 GridWidth;   // no tiles horizonally
@@ -63,6 +87,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> SentinelHexTile;
 
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;   // __ why virtual and override??
 

@@ -61,6 +61,28 @@ void AHexGridManager::SpawnTiles() {
 																	FVector(FIntPoint(GetXTilePos(x, y), GetYTilePos(y))),
 																	FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);
+			
+			if (current_spawn == EHexTileType::SENTINEL)
+			{	
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Sentinel_%d-%d"), x, y));
+			}
+			else if (current_spawn == EHexTileType::DEFAULT)
+			{
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+			}
+			else if (current_spawn == EHexTileType::ATTACKER)
+			{
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				AttackerTiles.Add(newTile);
+			}
+			else if (current_spawn == EHexTileType::DEFENDER)
+			{
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				DefenderTiles.Add(newTile);
+			}
+
+
+
 			HexGrid2DArray[x][y] = newTile;
 		}
 
@@ -111,18 +133,24 @@ float AHexGridManager::GetYTilePos(const int32 y)
 TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32 y, bool bOddRow)
 {
 	TSubclassOf<AHexTile> TileToSpawn = SentinelHexTile;  // Default value for hex tile is Sentinel Tile
+	current_spawn = EHexTileType::SENTINEL;
 
 	if (isGameplayTile(x, y, bOddRow))
 	{
 		TileToSpawn = DefaultHexTile;
+		current_spawn = EHexTileType::DEFAULT;
+
 		int32 FirstColumnStart = floor(GridHeight / 2) + BorderSize - floor(y / 2);
 		if (bOddRow ? x == FirstColumnStart + 1 : x == FirstColumnStart) // first column
 		{
 			TileToSpawn = AttackerHexTile;
+			current_spawn = EHexTileType::ATTACKER;
 		}
 		else if (x == GridWidth - BorderSize - 1  - floor(y / 2)) // last column
 		{
 			TileToSpawn = DefenderHexTile;
+			current_spawn = EHexTileType::DEFENDER;
+			
 		}
 	}
 	
@@ -133,9 +161,8 @@ TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32
 
 
 // Called when the game starts or when spawned
-void AHexGridManager::BeginPlay()
+void AHexGridManager::GenerateGrid()
 {
-	Super::BeginPlay();
 	BlueprintsCheck();
 
 	// "+2" is to reserve space for sentinel tiles on each side of the board
@@ -144,4 +171,9 @@ void AHexGridManager::BeginPlay()
 	InitHexGridArray();
 	SpawnTiles();
 
+}
+
+void AHexGridManager::BeginPlay()
+{
+	GenerateGrid();
 }

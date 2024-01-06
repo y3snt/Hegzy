@@ -25,8 +25,14 @@ class HEKSY_API AUnit : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AUnit();
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	FIntPoint TileIndex;
 
 	//TODO add some kind of refference or TAG to set which team unit is a member of
+	FIntPoint Neighbours(int32 Direction);
+	
+
+
 
 protected:
 #pragma region UnitSymbols

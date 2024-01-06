@@ -12,6 +12,17 @@ AUnit::AUnit()
 
 }
 
+
+FIntPoint Neighbours(int32 Direction)
+{
+	TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
+		FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
+	return directions[Direction];
+}
+
+
+
+
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
