@@ -8,20 +8,12 @@
 #include "HexTile.h"
 #include "Unit.h"
 
+#include "GameplayEnums.h"
 
 #include "HexGridManager.generated.h"
 
 
-UENUM()
-enum class EHexTileType : uint8  // __ why uint?
-{
-	INVALID,
-	SENTINEL,   
-	ATTACKER,
-	DEFENDER,
-	DEFAULT,
-	MAX UMETA(Hidden)  // __ ???
-};
+
 
 UCLASS()
 class HEKSY_API AHexGridManager : public AActor

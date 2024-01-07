@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "GameplayEnums.h"
+
 #include "HexTile.generated.h"
 
 class UStaticMeshComponent;
@@ -28,9 +31,10 @@ public:
 	FIntPoint TileIndex;
 
 
+	EHexTileType TileType;   // logical tile type
 protected:
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")  // U: property, that will be visible in the editor
-	//EHexTileType TileType;   // logical tile type
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	UStaticMeshComponent *TileMesh;  // U: visible mesh
