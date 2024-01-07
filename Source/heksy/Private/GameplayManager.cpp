@@ -23,7 +23,7 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	if (NewSelection != nullptr)
 	{
 		SelectedUnit = NewSelection;
-		PrintString("You have chosen an Unit");
+		PrintString("You have selected a Unit");
 		
 		return;
 	}
@@ -93,7 +93,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 	if (GEngine) // prints stuff to screen
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
-			FColor::Yellow, FString::Printf(TEXT("You summon an Unit")), true);
+			FColor::Yellow, FString::Printf(TEXT("You summon a Unit")), true);
 	
 	EHexTileType SelectedHex = GridManager->HexGrid2DArray[Cord.X][Cord.Y]->TileType;
 
