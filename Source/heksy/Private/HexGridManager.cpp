@@ -30,6 +30,7 @@ void AHexGridManager::AdjustGridSize()
 
 }
 
+//#include <typeinfo>
 
 void AHexGridManager::InitHexGridArray() 
 {
@@ -40,6 +41,12 @@ void AHexGridManager::InitHexGridArray()
 
 	HexGrid2DArray.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
 	UnitGrid2DArray.SetNumZeroed(GridWidth);
+
+	//auto x = typeid(HexGrid2DArray[0]).name();
+	//FString::Printf(x);
+
+
+
 	//if (UnitGrid2DArray[0] == std::nullptr_t)
 	
 
@@ -81,7 +88,7 @@ void AHexGridManager::SpawnTiles() {
 				DefenderTiles.Add(newTile);
 			}
 
-
+			newTile->TileType = current_spawn;
 
 			HexGrid2DArray[x][y] = newTile;
 		}
@@ -175,5 +182,5 @@ void AHexGridManager::GenerateGrid()
 
 void AHexGridManager::BeginPlay()
 {
-	GenerateGrid();
+	//GenerateGrid();
 }

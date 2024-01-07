@@ -13,7 +13,8 @@ AUnit::AUnit()
 }
 
 
-FIntPoint Neighbours(int32 Direction)
+
+FIntPoint AUnit::Neighbours(int32 Direction)
 {
 	TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
 		FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };

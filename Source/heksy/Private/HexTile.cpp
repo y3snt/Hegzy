@@ -12,4 +12,3 @@ AHexTile::AHexTile()
 	TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
 	TileMesh->SetupAttachment(RootComponent);  // attach component to the root / container
 }
-

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 
+#include "GameplayEnums.h"
+
 #include "Symbol.h"
 
 
@@ -27,6 +29,9 @@ public:
 	AUnit();
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	FIntPoint TileIndex;
+
+
+	EPlayer Owner;
 
 	//TODO add some kind of refference or TAG to set which team unit is a member of
 	FIntPoint Neighbours(int32 Direction);
