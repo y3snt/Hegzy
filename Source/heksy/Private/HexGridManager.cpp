@@ -13,6 +13,30 @@ AHexGridManager::AHexGridManager()
 
 
 
+EHexTileType AHexGridManager::GetTileType(const FIntPoint& Cord) //const
+{
+	return HexGrid[Cord.X][Cord.Y]->TileType;
+}
+
+AUnit* AHexGridManager::GetUnit(const FIntPoint& Cord)
+{
+	return UnitGrid[Cord.X][Cord.Y];
+}
+
+void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint& Cord)
+{
+	UnitGrid[Unit->CurrentCord.X][Unit->CurrentCord.Y] = nullptr; // clean your previous location
+	UnitGrid[Cord.X][Cord.Y] = Unit; // UnitGrid Update
+
+	Unit->CurrentCord = Cord; // update Unit Index
+	
+	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
+}
+
+
+
+#pragma region GenerateGrid
+
 void AHexGridManager::BlueprintsCheck()
 {
 	checkf(AttackerHexTile != NULL, TEXT("no AttackerHexTile"));
@@ -34,13 +58,9 @@ void AHexGridManager::AdjustGridSize()
 
 void AHexGridManager::InitHexGridArray() 
 {
-	/*
-		
-	*/
 
-
-	HexGrid2DArray.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
-	UnitGrid2DArray.SetNumZeroed(GridWidth);
+	HexGrid.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
+	UnitGrid.SetNumZeroed(GridWidth);
 
 	//auto x = typeid(HexGrid2DArray[0]).name();
 	//FString::Printf(x);
@@ -50,14 +70,15 @@ void AHexGridManager::InitHexGridArray()
 	//if (UnitGrid2DArray[0] == std::nullptr_t)
 	
 
-	for (int32 i = 0; i < HexGrid2DArray.Num(); i++)
+	for (int32 i = 0; i < HexGrid.Num(); i++)
 	{
-		UnitGrid2DArray[i].SetNumZeroed(GridHeight);
-		HexGrid2DArray[i].SetNumZeroed(GridHeight);  
+		UnitGrid[i].SetNumZeroed(GridHeight);
+		HexGrid[i].SetNumZeroed(GridHeight);  
 	}
 }
 
-void AHexGridManager::SpawnTiles() {
+void AHexGridManager::SpawnTiles()
+{
 	for (int32 y = 0; y < GridHeight; y++)
 	{
 		for (int32 x = 0; x < GridWidth; x++)
@@ -77,12 +98,12 @@ void AHexGridManager::SpawnTiles() {
 			{
 				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 			}
-			else if (current_spawn == EHexTileType::ATTACKER)
+			else if (current_spawn == EHexTileType::ATTACKER_SPAWN)
 			{
 				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 				AttackerTiles.Add(newTile);
 			}
-			else if (current_spawn == EHexTileType::DEFENDER)
+			else if (current_spawn == EHexTileType::DEFENDER_SPAWN)
 			{
 				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 				DefenderTiles.Add(newTile);
@@ -90,7 +111,7 @@ void AHexGridManager::SpawnTiles() {
 
 			newTile->TileType = current_spawn;
 
-			HexGrid2DArray[x][y] = newTile;
+			HexGrid[x][y] = newTile;
 		}
 
 	}
@@ -127,7 +148,7 @@ bool AHexGridManager::isGameplayTile(const int32 x, const int32 y, bool bOddRow)
 
 }
 
-float AHexGridManager::GetXTilePos(const int32 x, const int32 y)
+float AHexGridManager::GetXTilePos(const int32 x, const int32 y)  // TODO: remove this, switch back to previos
 {
 	return x * TileHorizontalOffset + y * OddRowHorizontalOffset;
 }
@@ -151,12 +172,12 @@ TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32
 		if (bOddRow ? x == FirstColumnStart + 1 : x == FirstColumnStart) // first column
 		{
 			TileToSpawn = AttackerHexTile;
-			current_spawn = EHexTileType::ATTACKER;
+			current_spawn = EHexTileType::ATTACKER_SPAWN;
 		}
 		else if (x == GridWidth - BorderSize - 1  - floor(y / 2)) // last column
 		{
 			TileToSpawn = DefenderHexTile;
-			current_spawn = EHexTileType::DEFENDER;
+			current_spawn = EHexTileType::DEFENDER_SPAWN;
 			
 		}
 	}
@@ -179,6 +200,9 @@ void AHexGridManager::GenerateGrid()
 	SpawnTiles();
 
 }
+
+#pragma endregion
+
 
 void AHexGridManager::BeginPlay()
 {

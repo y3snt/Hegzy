@@ -3,6 +3,7 @@
 
 #include "Unit.h"
 
+
 // Sets default values
 AUnit::AUnit()
 {
@@ -14,11 +15,10 @@ AUnit::AUnit()
 
 
 
-FIntPoint AUnit::Neighbours(int32 Direction)
+
+FIntPoint AUnit::Neighbour(int32 Direction)
 {
-	TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
-		FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
-	return directions[Direction];
+	return CurrentCord + directions[Direction];
 }
 
 
@@ -28,7 +28,6 @@ FIntPoint AUnit::Neighbours(int32 Direction)
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 
@@ -37,6 +36,5 @@ void AUnit::BeginPlay()
 void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

@@ -41,14 +41,10 @@ protected:
 	AUnit* SelectedUnit;
 
 
-	void TeleportUnit(FIntPoint Cord);
-
-
-
 public:
 
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	AHexGridManager *GridManager;
+	AHexGridManager *GridManager;  // TODO: singleton, SMART POINTERS!!!
 
 
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
@@ -63,8 +59,6 @@ public:
 
 	void SummonUnit(FIntPoint Cord);
 	void SetupGame();
-
-	AUnit* IsThereAllyUnit(FIntPoint Cord);
 
 	void SwitchPlayerTurn();
 
