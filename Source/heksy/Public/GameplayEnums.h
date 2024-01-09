@@ -16,8 +16,8 @@ enum class EHexTileType : uint8  // __ why uint?
 {
 	INVALID,
 	SENTINEL,
-	ATTACKER,
-	DEFENDER,
+	ATTACKER_SPAWN,
+	DEFENDER_SPAWN,
 	DEFAULT,
 	MAX UMETA(Hidden)  // __ ???
 };
