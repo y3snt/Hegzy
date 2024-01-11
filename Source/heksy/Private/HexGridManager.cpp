@@ -2,6 +2,7 @@
 
 #include "HexGridManager.h"
 
+
 // Sets default values
 AHexGridManager::AHexGridManager()
 {
@@ -12,8 +13,7 @@ AHexGridManager::AHexGridManager()
 }
 
 
-
-EHexTileType AHexGridManager::GetTileType(const FIntPoint& Cord) //const
+EHexTileType AHexGridManager::GetTileType(const FIntPoint& Cord) const
 {
 	return HexGrid[Cord.X][Cord.Y]->TileType;
 }
@@ -31,6 +31,15 @@ void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint& Cord)
 	Unit->CurrentCord = Cord; // update Unit Index
 	
 	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
+}
+
+
+void AHexGridManager::RemoveUnit(AUnit* Unit, const FIntPoint& Cord)
+{
+	UnitGrid[Cord.X][Cord.Y] = nullptr; // Remove unit from gameplay grid
+
+	//Unit->SetActorLocation(HexGrid[0][0]->GetActorLocation());
+	Unit->Destroy();
 }
 
 
@@ -65,8 +74,6 @@ void AHexGridManager::InitHexGridArray()
 	//auto x = typeid(HexGrid2DArray[0]).name();
 	//FString::Printf(x);
 
-
-
 	//if (UnitGrid2DArray[0] == std::nullptr_t)
 	
 
@@ -83,10 +90,13 @@ void AHexGridManager::SpawnTiles()
 	{
 		for (int32 x = 0; x < GridWidth; x++)
 		{
-			const bool oddRow = IsRowOdd(y);
+			const bool oddRow = y % 2 == 0;  // Sentinel Rows add aditional row
 			
+			const float XTilePos = x * TileHorizontalOffset + y * OddRowHorizontalOffset;
+			const float YTilePos = y * TileVerticalOffset;
+
 			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y, oddRow),
-																	FVector(FIntPoint(GetXTilePos(x, y), GetYTilePos(y))),
+																	FVector(FIntPoint(XTilePos, YTilePos)),
 																	FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);
 			
@@ -100,12 +110,12 @@ void AHexGridManager::SpawnTiles()
 			}
 			else if (current_spawn == EHexTileType::ATTACKER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
 				AttackerTiles.Add(newTile);
 			}
 			else if (current_spawn == EHexTileType::DEFENDER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
 				DefenderTiles.Add(newTile);
 			}
 
@@ -115,11 +125,6 @@ void AHexGridManager::SpawnTiles()
 		}
 
 	}
-}
-
-bool AHexGridManager::IsRowOdd(const int32 y) 
-{
-	return y % 2 == 0;  // Sentinel Rows add aditional row
 }
 
 bool AHexGridManager::isGameplayTile(const int32 x, const int32 y, bool bOddRow)
@@ -146,16 +151,6 @@ bool AHexGridManager::isGameplayTile(const int32 x, const int32 y, bool bOddRow)
 		&& ((gameplay_width_start	  <= x && x < gameplay_width_even_end && !bOddRow)  // even row width
 		|| ( gameplay_width_start + 1 <= x && x < gameplay_width_odd_end  && bOddRow)); // odd row width
 
-}
-
-float AHexGridManager::GetXTilePos(const int32 x, const int32 y)  // TODO: remove this, switch back to previos
-{
-	return x * TileHorizontalOffset + y * OddRowHorizontalOffset;
-}
-
-float AHexGridManager::GetYTilePos(const int32 y) 
-{
-	return y * TileVerticalOffset;
 }
 
 TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32 y, bool bOddRow)
@@ -201,10 +196,11 @@ void AHexGridManager::GenerateGrid()
 
 }
 
-#pragma endregion
-
-
 void AHexGridManager::BeginPlay()
 {
 	//GenerateGrid();
 }
+
+#pragma endregion
+
+

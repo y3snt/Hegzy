@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
+
 #include "HexTile.h"
 #include "Unit.h"
 
@@ -27,10 +28,7 @@ private:
 	void SpawnTiles();
 
 	void AdjustGridSize();
-	bool IsRowOdd(const int32 y);
 	bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
-	float GetXTilePos(const int32 x, const int32 y);
-	float GetYTilePos(const int32 y);
 	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 	EHexTileType current_spawn;  // ??
@@ -77,9 +75,11 @@ public:
 	TArray<AHexTile*> AttackerTiles;
 	TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
 
-	EHexTileType GetTileType(const FIntPoint& Cord);  // const
+	EHexTileType GetTileType(const FIntPoint& Cord) const;
 	AUnit* GetUnit(const FIntPoint& Cord);
 	void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
+
+	void RemoveUnit(AUnit* Unit, const FIntPoint& Cord);
 
 	void GenerateGrid();
 

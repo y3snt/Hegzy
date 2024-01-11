@@ -3,13 +3,13 @@
 
 #include "GameplayManager.h"
 
-#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, String)
+#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, String)
 
 
 
 AGameplayManager::AGameplayManager()
 {
-
+	AutomaticTest = EAutomaticTestsList::EMPTY;
 }
 
 
@@ -34,6 +34,10 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
 	{
+		/*
+		* Units are placed by the players in subsequent order on their chosen "Starting Locations"
+		* inside the area of the gameplay board.
+		*/
 		SummonUnit(Cord);
 	}
 	else  // Gameplay phase
@@ -46,17 +50,56 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 
 
-/**
- * Summon currently selected unit to a Gameplay Board
- * 
- * @param Cord cordinate, on which Unit will be summoned
- */
+
+
+void AGameplayManager::SwitchPlayerTurn()
+{
+	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
+}
+
+
+void AGameplayManager::Gameplay(FIntPoint Cord)
+{
+	PrintString("Gameplay is working");
+	testKillUnit(Cord);
+}
+
+
+void AGameplayManager::testKillUnit(FIntPoint Cord)
+{
+	AUnit* NewSelection = GridManager->GetUnit(Cord);
+	if (NewSelection != nullptr && NewSelection->Controller != CurrentPlayer)
+	{
+		if (CurrentPlayer == EPlayer::DEFENDER)
+		{
+			AttackerUnits.Remove(NewSelection);
+		}
+		else
+		{
+			DefenderUnits.Remove(NewSelection);
+		}
+		GridManager->RemoveUnit(NewSelection, Cord);
+
+		if (CurrentPlayer == EPlayer::ATTACKER && DefenderUnits.Num() == 0)
+			PrintString("Attacker won");
+		else if(CurrentPlayer == EPlayer::DEFENDER && AttackerUnits.Num() == 0)
+			PrintString("Defender won");
+
+		SwitchPlayerTurn();
+	}
+}
+
+
+
 void AGameplayManager::SummonUnit(FIntPoint Cord)
 {
-	/*
-	* Placing Units by the player in subsequent order on their chosen "Starting Locations"
-	* inside the area of the gameplay board.
-	*/
+	/**
+	 * Summon currently selected unit to a Gameplay Board
+	 *
+	 *
+	 * @param Cord cordinate, on which Unit will be summoned
+	 */
+	
 
 	// check if unit is already summoned
 	EHexTileType SelectedUnitTileType = GridManager->GetTileType(SelectedUnit->CurrentCord);  // todo getters/setters
@@ -67,13 +110,13 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 		return;
 	}
 
-	
+
 	EHexTileType SelectedHexType = GridManager->GetTileType(Cord);
 
 	bool bSelectedCurrentPlayerSpawn =
 		(SelectedHexType == EHexTileType::ATTACKER_SPAWN && CurrentPlayer == EPlayer::ATTACKER) ||
 		(SelectedHexType == EHexTileType::DEFENDER_SPAWN && CurrentPlayer == EPlayer::DEFENDER);
-		
+
 	if (!bSelectedCurrentPlayerSpawn)
 	{
 		PrintString("Thats a wrong summon location");  // TODO: Don't reset SelectedUnit
@@ -89,20 +132,37 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	UnitsLeftToBeSummoned--;
 }
 
-
-
-
-void AGameplayManager::SwitchPlayerTurn()
+#include "Kismet/KismetMathLibrary.h"
+void AGameplayManager::SimpleAutomaticTests()
 {
-	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
+	if (AutomaticTest == EAutomaticTestsList::EMPTY)
+	{
+		return;
+	}
+	
+
+	if (AutomaticTest == EAutomaticTestsList::BASIC_UNIT_SETUP)
+	{
+		for (int32 i = 0; i < FMath::Max3(AttackerUnits.Num(), DefenderUnits.Num(), 0); i++)
+		{
+			if (i < AttackerUnits.Num())
+			{
+				InputListener(AttackerUnits[i]->CurrentCord);
+				InputListener(AttackerUnits[i]->CurrentCord + AttackerUnits[i]->Direction(0));
+			}
+			if (i < DefenderUnits.Num())
+			{
+				InputListener(DefenderUnits[i]->CurrentCord);
+				InputListener(DefenderUnits[i]->CurrentCord + DefenderUnits[i]->Direction(3));
+			}
+		}
+		return;
+	}
 }
 
 
-void AGameplayManager::Gameplay(FIntPoint Cord)
-{
-	PrintString("Gameplay is working");
-}
 
+#pragma region GameSetup
 
 void AGameplayManager::SpawnUnits()
 {
@@ -144,19 +204,21 @@ void AGameplayManager::SetupGame()
 	GridManager->GenerateGrid();
 	SpawnUnits();
 
+	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
+	SimpleAutomaticTests();
+	
 }
 
 
+
 /*
-
-
 void AGameplayManager::TimerFunction()
 {
 	CallTracker--;
 	if (CallTracker == 0)
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
-		SetupGame();
+		SimpleAutomaticTests();
 	}
 }
 */
@@ -165,6 +227,8 @@ void AGameplayManager::BeginPlay()
 {
 	SetupGame();
 	
-	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
+	
 	
 }
+
+#pragma endregion
