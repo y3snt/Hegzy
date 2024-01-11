@@ -23,7 +23,14 @@
  */
 
 
-
+UENUM()
+enum class EAutomaticTestsList : uint8  // __ why uint?
+{
+	INVALID,
+	EMPTY,
+	BASIC_UNIT_SETUP,
+	MAX UMETA(Hidden)  // __ ???
+};
 
 
 UCLASS()
@@ -40,6 +47,11 @@ protected:
 
 	AUnit* SelectedUnit;
 
+
+	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")   // __ ? we can change the value of a blueprint later
+	EAutomaticTestsList AutomaticTest;
+
+	void SimpleAutomaticTests();
 
 public:
 
@@ -61,6 +73,15 @@ public:
 	void SetupGame();
 
 	void SwitchPlayerTurn();
+
+
+	void testKillUnit(FIntPoint Cord);
+
+
+	
+
+
+
 
 
 	/*
