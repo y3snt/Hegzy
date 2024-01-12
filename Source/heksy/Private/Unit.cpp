@@ -11,6 +11,12 @@ AUnit::AUnit()
 	UnitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
 	UnitMesh->SetupAttachment(RootComponent);  // attach component to the root / container
 
+	
+
+	//SymbolTest = FSubObject<FrontSymbol>(TEXT("SymbolMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
+	//SymbolTest->SetupAttachment(RootComponent);  // attach component to the root / container
+
+	CurrentRotation = 0;
 }
 
 
@@ -22,7 +28,14 @@ FIntPoint AUnit::Neighbour(int32 Direction)
 }
 
 
+/*
+ASymbol* AUnit::GetSymbol(int32 side)
+{
+	//TArray<ASymbol*> Symbols = { FrontSymbol, };
 
+	return nullptr;
+}
+*/
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
