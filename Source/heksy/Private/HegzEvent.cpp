@@ -1,5 +1,4 @@
-#include "HegzEvent.h"
-#include "EventHandler.h"
+/*#include "HegzEvent.h"
 
 template <typename... Args> 
 void HegzEvent<Args...>::operator()(Args... params) const
@@ -11,27 +10,27 @@ void HegzEvent<Args...>::operator()(Args... params) const
 }
 
 template <typename... Args> 
-/*inline*/ HegzEvent<Args...>& HegzEvent<Args...>::operator+=(const std::function<void(Args...)>& handler)  // ew. check if same handler is not added twice... but ==
+inline HegzEvent<Args...>& HegzEvent<Args...>::operator+=(const TFunction<void(Args...)>& handler)  // ew. check if same handler is not added twice... but ==
 {
     Add(handler);
     return *this;
 }
 
 template <typename... Args> 
-/*inline*/ HegzEvent<Args...>& HegzEvent<Args...>::operator+=(const EventHandler<Args...>& handler)
+inline HegzEvent<Args...>& HegzEvent<Args...>::operator+=(const EventHandler<Args...>& handler)
 {
     AddHandler(handler);
     return *this;
 }
 
 template <typename... Args> 
-/*inline*/ bool HegzEvent<Args...>::operator-=(const EventHandler<Args...>& handler)
+inline bool HegzEvent<Args...>::operator-=(const EventHandler<Args...>& handler)
 {
     return RemoveHandler(handler);
 }
 
 template <typename... Args> 
-/*inline*/ void HegzEvent<Args...>::Add(const std::function<void(Args...)>& handler)  // ? remove explicit
+inline void HegzEvent<Args...>::Add(const TFunction<void(Args...)>& handler)  // ? remove explicit
 {
     AddHandler(EventHandler<Args...>(handler));
 }
@@ -56,3 +55,4 @@ bool HegzEvent<Args...>::RemoveHandler(const EventHandler<Args...>& handler)
 }
 
 
+*/
