@@ -77,3 +77,5 @@ Android_ASTC/*
 Windows/*
 WindowsNoEditor/*
 DerivedDataCache/*
+
+enc_temp_folder/*
