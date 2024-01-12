@@ -139,7 +139,7 @@ GameInput::Tick()
 //== = GAMEMANAGER ==== =
 /*
 PlayerTurn = Enum.Player1;
-Cord LastInput = null;  // ?? is it needed
+//Cord LastInput = null;  // ?? is it needed
 
 // Unit *CurrentSelectedUnit = nullptr; //unitjakis  TODO: check if shared_ptr is needed
 Unit &CurrentSelectedUnit = null;  // this must be pointer if we want null
@@ -150,18 +150,18 @@ GameManager::SwitchPlayerTurn()
 GameManager::Listener(Cord)
 
 	if IsFriendlyUnitOn(Cord):  // wybor jednostki
-		LastInput = Cord
+		//LastInput = Cord
 		CurrrentSelectedUnit = &UnitsArray[Cord];  // ? pass by reference
 
 	elif CurrrentSelectedUnit != null && IsLegalMove(Cord):   // or just CurrentSelectedUnit
-		CurrrentSelectedUnit.Move(Cord)
+		CurrrentSelectedUnit->Move(Cord)
 
 		CurrrentSelectedUnit = null
 		GameManager::SwitchPlayerTurn()
 		
 
 GameManager::IsLegalMove(Cord)   // if pushed: check if not legal move => destroy
-	if IsFriendlyUnitOnCord(Cord) || HexGridManager.IsTileSentinel(Cord)
+	if HexGridManager.IsTileSentinel(Cord)//TODO obsluga tarcz
 		return false;
 	
 	return true;
@@ -250,3 +250,80 @@ unit get_stuff(x, y)
 */
 
 #pragma endregion
+
+
+
+
+
+
+#pragma region Stuff I would like to have
+
+
+/*
+is there a shield?
+is there an enemy spear on this tile and from which direction it comes
+
+
+
+
+*/
+
+
+
+/*
+Cool scripts:
+
+we have a tile
+now we check that there are actually neighbours so we want to get only their symbols that align with us
+
+
+So someone in Front of us (our 0) is also rotated toward us (if our rotation is 0, then his is 3)
+
+Code:
+our_rotation .. their_rotation  .. contact_rotation
+
+
+
+
+
+*/
+
+
+#pragma endregion
+
+
+
+
+/*
+Yi = 0  // side
+R1 = 0  // U.rotation
+
+U2 = 0
+
+U1 -> OnMoveEvent(this, currentCord)
+
+GameplayManager::
+	?OnMove(U1, cord) -> CheckPositions(U1, cord)
+
+
+3 4 5 0 1 2  <- Xi
+0 1 2 3 4 5  <- Yi
+
+
+GameplayManager::CheckPositions(Unit, cord) 
+	for Y, ajdCord in enumerate(ajd_Cords)
+		X = (Y + 3) % 6 // super 3
+		Y -= Unit.Rotation
+		U2 = Units[adjCord] // != null
+		U2.Symbols(X - U2.Rotation)
+
+
+
+
+
+
+
+
+
+
+*/

@@ -2,6 +2,7 @@
 
 #include "HexGridManager.h"
 
+
 // Sets default values
 AHexGridManager::AHexGridManager()
 {
@@ -12,6 +13,50 @@ AHexGridManager::AHexGridManager()
 }
 
 
+EHexTileType AHexGridManager::GetTileType(const FIntPoint& Cord) const
+{
+	return HexGrid[Cord.X][Cord.Y]->TileType;
+}
+
+AUnit* AHexGridManager::GetUnit(const FIntPoint& Cord)
+{
+	return UnitGrid[Cord.X][Cord.Y];
+}
+
+void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint& Cord)
+{
+	UnitGrid[Unit->CurrentCord.X][Unit->CurrentCord.Y] = nullptr; // clean your previous location
+	UnitGrid[Cord.X][Cord.Y] = Unit; // UnitGrid Update
+
+	Unit->CurrentCord = Cord; // update Unit Index
+	
+	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
+}
+
+void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
+{
+	/**
+	 * 360 / 6 = 60 -> degrees needed to rotate unit
+	 * 
+	 * \param Unit - Reference to the object we are rotating
+	 */
+	Unit->CurrentRotation = Direction;
+	Unit->SetActorRotation(FRotator(0, 60 * Direction, 0), ETeleportType::TeleportPhysics);
+}
+
+
+
+void AHexGridManager::RemoveUnit(AUnit* Unit, const FIntPoint& Cord)
+{
+	UnitGrid[Cord.X][Cord.Y] = nullptr; // Remove unit from gameplay grid
+
+	//Unit->SetActorLocation(HexGrid[0][0]->GetActorLocation());
+	Unit->Destroy();
+}
+
+
+
+#pragma region GenerateGrid
 
 void AHexGridManager::BlueprintsCheck()
 {
@@ -34,38 +79,36 @@ void AHexGridManager::AdjustGridSize()
 
 void AHexGridManager::InitHexGridArray() 
 {
-	/*
-		
-	*/
 
-
-	HexGrid2DArray.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
-	UnitGrid2DArray.SetNumZeroed(GridWidth);
+	HexGrid.SetNumZeroed(GridWidth);  // __ how it works exactly - print the content / debugger
+	UnitGrid.SetNumZeroed(GridWidth);
 
 	//auto x = typeid(HexGrid2DArray[0]).name();
 	//FString::Printf(x);
 
-
-
 	//if (UnitGrid2DArray[0] == std::nullptr_t)
 	
 
-	for (int32 i = 0; i < HexGrid2DArray.Num(); i++)
+	for (int32 i = 0; i < HexGrid.Num(); i++)
 	{
-		UnitGrid2DArray[i].SetNumZeroed(GridHeight);
-		HexGrid2DArray[i].SetNumZeroed(GridHeight);  
+		UnitGrid[i].SetNumZeroed(GridHeight);
+		HexGrid[i].SetNumZeroed(GridHeight);  
 	}
 }
 
-void AHexGridManager::SpawnTiles() {
+void AHexGridManager::SpawnTiles()
+{
 	for (int32 y = 0; y < GridHeight; y++)
 	{
 		for (int32 x = 0; x < GridWidth; x++)
 		{
-			const bool oddRow = IsRowOdd(y);
+			const bool oddRow = y % 2 == 0;  // Sentinel Rows add aditional row
 			
+			const float XTilePos = x * TileHorizontalOffset + y * OddRowHorizontalOffset;
+			const float YTilePos = y * TileVerticalOffset;
+
 			AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y, oddRow),
-																	FVector(FIntPoint(GetXTilePos(x, y), GetYTilePos(y))),
+																	FVector(FIntPoint(XTilePos, YTilePos)),
 																	FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);
 			
@@ -77,28 +120,23 @@ void AHexGridManager::SpawnTiles() {
 			{
 				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 			}
-			else if (current_spawn == EHexTileType::ATTACKER)
+			else if (current_spawn == EHexTileType::ATTACKER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
 				AttackerTiles.Add(newTile);
 			}
-			else if (current_spawn == EHexTileType::DEFENDER)
+			else if (current_spawn == EHexTileType::DEFENDER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
 				DefenderTiles.Add(newTile);
 			}
 
 			newTile->TileType = current_spawn;
 
-			HexGrid2DArray[x][y] = newTile;
+			HexGrid[x][y] = newTile;
 		}
 
 	}
-}
-
-bool AHexGridManager::IsRowOdd(const int32 y) 
-{
-	return y % 2 == 0;  // Sentinel Rows add aditional row
 }
 
 bool AHexGridManager::isGameplayTile(const int32 x, const int32 y, bool bOddRow)
@@ -127,16 +165,6 @@ bool AHexGridManager::isGameplayTile(const int32 x, const int32 y, bool bOddRow)
 
 }
 
-float AHexGridManager::GetXTilePos(const int32 x, const int32 y)
-{
-	return x * TileHorizontalOffset + y * OddRowHorizontalOffset;
-}
-
-float AHexGridManager::GetYTilePos(const int32 y) 
-{
-	return y * TileVerticalOffset;
-}
-
 TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32 y, bool bOddRow)
 {
 	TSubclassOf<AHexTile> TileToSpawn = SentinelHexTile;  // Default value for hex tile is Sentinel Tile
@@ -151,12 +179,12 @@ TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32
 		if (bOddRow ? x == FirstColumnStart + 1 : x == FirstColumnStart) // first column
 		{
 			TileToSpawn = AttackerHexTile;
-			current_spawn = EHexTileType::ATTACKER;
+			current_spawn = EHexTileType::ATTACKER_SPAWN;
 		}
 		else if (x == GridWidth - BorderSize - 1  - floor(y / 2)) // last column
 		{
 			TileToSpawn = DefenderHexTile;
-			current_spawn = EHexTileType::DEFENDER;
+			current_spawn = EHexTileType::DEFENDER_SPAWN;
 			
 		}
 	}
@@ -184,3 +212,7 @@ void AHexGridManager::BeginPlay()
 {
 	//GenerateGrid();
 }
+
+#pragma endregion
+
+

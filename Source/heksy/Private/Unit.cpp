@@ -3,6 +3,7 @@
 
 #include "Unit.h"
 
+
 // Sets default values
 AUnit::AUnit()
 {
@@ -10,25 +11,36 @@ AUnit::AUnit()
 	UnitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
 	UnitMesh->SetupAttachment(RootComponent);  // attach component to the root / container
 
+	
+
+	//SymbolTest = FSubObject<FrontSymbol>(TEXT("SymbolMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
+	//SymbolTest->SetupAttachment(RootComponent);  // attach component to the root / container
+
+	CurrentRotation = 0;
 }
 
 
 
-FIntPoint AUnit::Neighbours(int32 Direction)
+
+FIntPoint AUnit::Neighbour(int32 Direction)
 {
-	TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
-		FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
-	return directions[Direction];
+	return CurrentCord + directions[Direction];
 }
 
 
+/*
+ASymbol* AUnit::GetSymbol(int32 side)
+{
+	//TArray<ASymbol*> Symbols = { FrontSymbol, };
 
+	return nullptr;
+}
+*/
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 
@@ -37,6 +49,5 @@ void AUnit::BeginPlay()
 void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

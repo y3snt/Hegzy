@@ -28,21 +28,25 @@ public:
 	// Sets default values for this pawn's properties
 	AUnit();
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	FIntPoint TileIndex;
+	FIntPoint CurrentCord;
 
-
-	EPlayer Owner;
+	EPlayer Controller;
 
 	//TODO add some kind of refference or TAG to set which team unit is a member of
-	FIntPoint Neighbours(int32 Direction);
-	
+	FIntPoint Neighbour(int32 Direction);
+	//void SetCurrentCord(const FIntPoint& Cord);
 
+	
 
 
 protected:
 #pragma region UnitSymbols
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	TArray<ASymbol*> Symbols;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")  // U: property, that will be visible in the editor
-		TSubclassOf <ASymbol> FrontSymbol;
+	TSubclassOf <ASymbol> FrontSymbol;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	TSubclassOf<ASymbol> FrontRightSymbol;
@@ -61,18 +65,33 @@ protected:
 
 #pragma endregion
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Model")
 	UStaticMeshComponent *UnitMesh;  // U: visible mesh
 
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Model")
 	//UPaperSpriteComponent *UnitSprite;  // U: visible mesh
 
+	const TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
+		FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
+
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+
+//	static FIntPoint Direction(int32 Side); //TODO think about how to make it static
+
+	static FIntPoint Direction(int32 Side)
+	{//TODO
+		const TArray<FIntPoint> directions = { FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
+			FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
+		return directions[Side];
+	}
+
+	
+
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
