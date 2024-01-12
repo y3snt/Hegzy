@@ -3,32 +3,27 @@
 #pragma once
 #include "CoreMinimal.h"
 
-
-
-#include <functional>
-
 #include "EventHandler.cpp"
 
-
+#include <functional>
 
 /**
  * 
  */
 
-//template <typename... Args> // variadic template - any no of args
+template <typename... Args> // variadic template - any no of args
 class HEKSY_API EventHandler // holds specific function that will be invoked, onEvent call
 {
 	//GENERATED_BODY()
 
-	//std::function<void(Args...)> HandlerFunc;
+private:
+	std::function<void(Args...)> HandlerFunc;
 
 public:
-	//explicit EventHandler(const std::function<void(Args...)>& Func);
-	EventHandler();
-
-
+	EventHandler(const std::function<void(Args...)>& Func); // ?explicit
 	~EventHandler();
 
-	//void operator()(Args... params) const;  // EventHandler(...) operator overloading
+	void operator()(Args... params) const;  // EventHandler(...) operator overloading
+	void operator()(Args... params) const;  // EventHandler(...) operator overloading
 };
 

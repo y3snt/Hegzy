@@ -7,19 +7,15 @@
 
 #include <functional>
 
-#include "HegzyEvents.cpp"
+#include "HegzEvent.h"
 
 
-/**
- * 
- */
-//template <typename... Args> // variadic template - any no of args
 class HEKSY_API HegzyEvents
 {
-	//std::function<void(Args...)> HandlerFunc;
+	HegzEvent<int> UnitMoved;
 
-public:
+//public:
 	//explicit HegzyEvents(const std::function<void(Args...)>& Func);
-	HegzyEvents();
-	~HegzyEvents();
+	//HegzyEvents();
+	//~HegzyEvents();
 };
