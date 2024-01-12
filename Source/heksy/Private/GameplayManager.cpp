@@ -127,10 +127,6 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 	// TeleportUnit(Cord);
 	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
-	if (CurrentPlayer == EPlayer::ATTACKER)
-		GridManager->RotateUnit(SelectedUnit, 4);
-	else
-		GridManager->RotateUnit(SelectedUnit, 1);
 	SwitchPlayerTurn();
 
 	UnitsLeftToBeSummoned--;
