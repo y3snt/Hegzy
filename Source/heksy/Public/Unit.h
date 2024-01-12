@@ -29,6 +29,8 @@ public:
 	AUnit();
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	FIntPoint CurrentCord;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	int32 CurrentRotation;
 
 	EPlayer Controller;
 
@@ -88,6 +90,8 @@ public:
 			FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1) };
 		return directions[Side];
 	}
+
+	
 
 	
 

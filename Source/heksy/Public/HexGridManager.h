@@ -77,7 +77,10 @@ public:
 
 	EHexTileType GetTileType(const FIntPoint& Cord) const;
 	AUnit* GetUnit(const FIntPoint& Cord);
+	
 	void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
+	void RotateUnit(AUnit* Unit, int32 Direction);
+
 
 	void RemoveUnit(AUnit* Unit, const FIntPoint& Cord);
 

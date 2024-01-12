@@ -33,6 +33,18 @@ void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint& Cord)
 	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
 }
 
+void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
+{
+	/**
+	 * 360 / 6 = 60 -> degrees needed to rotate unit
+	 * 
+	 * \param Unit - Reference to the object we are rotating
+	 */
+	Unit->CurrentRotation = Direction;
+	Unit->SetActorRotation(FRotator(0, 60 * Direction, 0), ETeleportType::TeleportPhysics);
+}
+
+
 
 void AHexGridManager::RemoveUnit(AUnit* Unit, const FIntPoint& Cord)
 {
