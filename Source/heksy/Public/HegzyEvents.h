@@ -3,7 +3,7 @@
 #pragma once
 
 
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
 
 #include <functional>
 
@@ -12,7 +12,10 @@
 
 class HEKSY_API HegzyEvents
 {
-	HegzEvent<int> UnitMoved;
+	//GENERATED_BODY()
+
+public:
+	static HegzEvent<int> UnitMoved;
 
 //public:
 	//explicit HegzyEvents(const std::function<void(Args...)>& Func);
