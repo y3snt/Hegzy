@@ -2,6 +2,10 @@
 
 //#include <functional>
 #include "HegzyEvents.h"
+
+//HegzEvent<int> HegzyEvents::OnUnitMoved;
+
+
 /*
 
 HegzyEvents::HegzyEvents()
