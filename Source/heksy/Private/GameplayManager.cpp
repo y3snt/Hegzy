@@ -1,5 +1,15 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+/**
+ * Main Class of the Hegzy Project.
+ * It generates neccesary values at the start of the level in BeginPlay()
+ *  then await Input System to call "InputListerner(FIntPoint Cord)".
+ * 
+ * GameplayManager depends on the Unit.h and HexGridManager.h
+ * //Unit - is the next layer of the architecture dealing with smaller and more detailed gameplay systems
+ * GridManager - is a tool used to manage the map
+ */
+
 
 #include "GameplayManager.h"
 
@@ -53,7 +63,7 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 
 void AGameplayManager::SwitchPlayerTurn()
-{
+{ // Currently works only for 2 players
 	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
 }
 

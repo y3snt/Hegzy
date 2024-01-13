@@ -81,11 +81,11 @@ public:
 	AUnit* GetUnit(const FIntPoint& Cord);
 	
 	void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
-	void RotateUnit(AUnit* Unit, int32 Direction);
+	void RotateUnit(AUnit* Unit, int32 Side);
 
 	bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
-	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2);
-
+	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side
+	FIntPoint AdjacentCord(const FIntPoint& BaseCord, int32 Side); //? TODO add static
 
 	void RemoveUnit(AUnit* Unit, const FIntPoint& Cord);
 

@@ -47,7 +47,7 @@ void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
 {
 	/**
 	 * 360 / 6 = 60 -> degrees needed to rotate unit
-	 * 
+	 *
 	 * \param Unit - Reference to the object we are rotating
 	 */
 	Unit->CurrentRotation = Direction;
@@ -74,9 +74,45 @@ bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
 }
 
 int32 AHexGridManager::AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2)
-{
+{	
+	/**
+	* Return shared side between Cord1 and Cord2
+	* 
+	* @param Cord1 
+	* @param Cord2 
+	* @return int32 Side
+	* @note INDEX_NONE is return, when Cord1 and Cord2 don't have shared side
+	*/
 	return Directions.Find(Cord2 - Cord1);
 }
+
+
+FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, int32 Side)
+{
+	/**
+	 * Return cord adjacent to BaseCord at given Side
+	 *
+	 * @param BaseCord
+	 * @param Side {0, 1, ..., 5}
+	 * @return FIntPoint Cord adjacent to BaseCord
+	 */
+	return BaseCord + Directions[Side];
+}
+
+/* Maybe TODO
+FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, const FIntPoint& Direction)
+{
+	/**
+	 * Return cord adjacent to BaseCord at given Direction
+	 *
+	 * @param BaseCord
+	 * @param Side {0, 1, ..., 5}
+	 * @return FIntPoint Cord adjacent to BaseCord
+	 */
+	// TODO: Normalize dircetion first to match one of the Directions
+	//return BaseCord + Directions[Side];
+//}
+
 
 
 #pragma region GenerateGrid
