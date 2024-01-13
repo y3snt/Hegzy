@@ -3,23 +3,24 @@
 #pragma once
 
 
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
 
-#include <functional>
+// #include <functional>
 
-#include "HegzyEvents.cpp"
+#include "HegzEvent.h"
 
 
-/**
- * 
- */
-//template <typename... Args> // variadic template - any no of args
 class HEKSY_API HegzyEvents
 {
-	//std::function<void(Args...)> HandlerFunc;
+	//GENERATED_BODY()
 
 public:
+	//static HegzEvent<FIntPoint> OnUnitMoved;
+	//static HegzEvent<int> OnUnitMoved;
+	// static const int a = 5; // test
+
+//public:
 	//explicit HegzyEvents(const std::function<void(Args...)>& Func);
-	HegzyEvents();
-	~HegzyEvents();
+	//HegzyEvents();
+	//~HegzyEvents();
 };

@@ -7,6 +7,7 @@
 
 // Trick
 #include "LevelUtils.h"
+#include "Kismet/KismetMathLibrary.h"  // Max3 Function
 
 // Gameplay Actor
 #include "HexGridManager.h"
@@ -65,14 +66,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
 	TArray<AUnit*> DefenderUnits;
 
+
 	void InputListener(FIntPoint Cord);
 
-	void Gameplay(FIntPoint Cord);
+	
 
 	void SummonUnit(FIntPoint Cord);
 	void SetupGame();
 
 	void SwitchPlayerTurn();
+
+	void Gameplay(FIntPoint Cord);
+
+	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
 
 	void testKillUnit(FIntPoint Cord);
