@@ -30,7 +30,7 @@ public:
 	//EventHandler(const void(*Func)(inargs...)); // ?explicit
 	//EventHandler(const std::function<void(Args...)>& Func); // ?explicit
 
-	~EventHandler();
+	//~EventHandler();
 
 	//void operator()(Args... params) const;  // EventHandler(...) operator overloading
 	void operator()(Args... params) const  // EventHandler(...) operator overloading
