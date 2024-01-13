@@ -11,14 +11,14 @@
 
 #include "Symbol.h"
 
-#include "HegzyEvents.h"
+//#include "HegzyEvents.h"
+
+//#include "HegzEvent.cpp" //aa
 
 
 //#include "C:/Users/tomek/Documents/GitHub/CPP/Heksy   /Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperSpriteComponent.h”
 
 #include "Unit.generated.h"
-
-
 
 
 
@@ -113,7 +113,7 @@ public:
 		return Directions[Side];
 	}
 
-	static int32 DirectionToSide(FIntPoint Direction)
+	static int32 DirectionToSide(FIntPoint Direction)  // TODO: MOVE THIS SOMEWHERE
 	{
 		
 		TArray<FIntPoint> Directions = {
@@ -132,7 +132,7 @@ public:
 	}
 
 	
-
+	void Rotate(int32 Side);
 	
 
 
