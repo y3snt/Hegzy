@@ -3,7 +3,7 @@
 
 #include "GameplayManager.h"
 
-#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, String)
+#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
 
 
@@ -61,7 +61,44 @@ void AGameplayManager::SwitchPlayerTurn()
 void AGameplayManager::Gameplay(FIntPoint Cord)
 {
 	PrintString("Gameplay is working");
-	testKillUnit(Cord);
+	
+	int32 direction;
+	if (IsLegalMove(Cord, direction))
+	{
+		PrintString(FString::Printf(TEXT("DIRECTION_%d"), direction));
+		testKillUnit(Cord);
+		GridManager->ChangeUnitPosition(SelectedUnit, Cord);
+
+		int32 new_direction = (direction) % 6;
+		PrintString(FString::Printf(TEXT("_%d"), new_direction));
+		GridManager->RotateUnit(SelectedUnit, new_direction);
+
+		SwitchPlayerTurn();
+	}
+	
+}
+
+
+bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
+{
+	/**
+	 * Function has to check 2 things:
+	 * 1 Target Cord is a Neighbour of a SelectedUnit
+	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
+	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
+	 * 
+	 * @param Cord
+	 * @return 
+	 */
+	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);
+	if (ResultSide == INDEX_NONE)
+		return false;
+
+
+	// 2
+	//if (GridManager->GetUnit(Cord))
+	
+	return true;
 }
 
 
@@ -84,8 +121,6 @@ void AGameplayManager::testKillUnit(FIntPoint Cord)
 			PrintString("Attacker won");
 		else if(CurrentPlayer == EPlayer::DEFENDER && AttackerUnits.Num() == 0)
 			PrintString("Defender won");
-
-		SwitchPlayerTurn();
 	}
 }
 
@@ -129,9 +164,9 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
 
 	if (CurrentPlayer == EPlayer::ATTACKER)
-		GridManager->RotateUnit(SelectedUnit, 4);
+		GridManager->RotateUnit(SelectedUnit, 0);
 	else
-		GridManager->RotateUnit(SelectedUnit, 1);
+		GridManager->RotateUnit(SelectedUnit, 3);
 
 
 	SwitchPlayerTurn();
@@ -139,7 +174,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	UnitsLeftToBeSummoned--;
 }
 
-#include "Kismet/KismetMathLibrary.h"
+
 void AGameplayManager::SimpleAutomaticTests()
 {
 	if (AutomaticTest == EAutomaticTestsList::EMPTY)

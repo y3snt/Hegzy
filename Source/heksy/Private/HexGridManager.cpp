@@ -3,6 +3,16 @@
 #include "HexGridManager.h"
 
 
+const TArray<FIntPoint> AHexGridManager::Directions = {
+	FIntPoint(1, 0),
+	FIntPoint(0, 1),
+	FIntPoint(-1, 1),
+	FIntPoint(-1, 0),
+	FIntPoint(0, -1),
+	FIntPoint(1, -1)
+};
+
+
 // Sets default values
 AHexGridManager::AHexGridManager()
 {
@@ -41,7 +51,8 @@ void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
 	 * \param Unit - Reference to the object we are rotating
 	 */
 	Unit->CurrentRotation = Direction;
-	Unit->SetActorRotation(FRotator(0, 60 * Direction, 0), ETeleportType::TeleportPhysics);
+	// "Direction + 4" Accounts for global rotation setting for objects in the level
+	Unit->SetActorRotation(FRotator(0, 60 * (Direction + 4), 0), ETeleportType::TeleportPhysics);
 }
 
 
@@ -54,6 +65,18 @@ void AHexGridManager::RemoveUnit(AUnit* Unit, const FIntPoint& Cord)
 	Unit->Destroy();
 }
 
+
+bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
+{
+	int32 Index = Directions.Find(Cord2 - Cord1);
+
+	return (Index == INDEX_NONE)? false : true;
+}
+
+int32 AHexGridManager::AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2)
+{
+	return Directions.Find(Cord2 - Cord1);
+}
 
 
 #pragma region GenerateGrid
