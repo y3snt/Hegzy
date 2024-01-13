@@ -10,6 +10,7 @@
 #include "Unit.h"
 
 #include "GameplayEnums.h"
+//#include "GameplayConstants.h"
 
 #include "HexGridManager.generated.h"
 
@@ -32,6 +33,7 @@ private:
 	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 	EHexTileType current_spawn;  // ??
+	const static TArray<FIntPoint> Directions;
 
 
 protected:
@@ -80,6 +82,9 @@ public:
 	
 	void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
 	void RotateUnit(AUnit* Unit, int32 Direction);
+
+	bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
+	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2);
 
 
 	void RemoveUnit(AUnit* Unit, const FIntPoint& Cord);
