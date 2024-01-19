@@ -16,11 +16,244 @@
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
 
+#pragma region Tools
 
-AGameplayManager::AGameplayManager()
-{
-	AutomaticTest = EAutomaticTestsList::EMPTY;
+void AGameplayManager::SwitchPlayerTurn()
+{ // Currently works only for 2 players
+	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
 }
+
+bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
+{
+	/**
+	 * Function has to check 2 things:
+	 * 1 Target Cord is a Neighbour of a SelectedUnit
+	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
+	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
+	 * 
+	 * @param Cord
+	 * @return 
+	 */
+
+	// 1
+	// returns an integer (side), if the cord is adjacent
+	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
+	if (ResultSide == INDEX_NONE)
+		return false;
+
+
+	// 2
+	AUnit* EnemyUnit = GridManager->GetUnit(Cord);
+	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
+		return true;
+
+	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
+		return false;
+
+	if (EnemyUnit->Symbols[(((ResultSide + 3 + 6) % 6) - EnemyUnit->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
+		return false;
+
+	return true;
+}
+
+
+
+/* TODO
+1 Action
+2 Check for Spear Damage
+3 Check for shield in IsLegalMove
+*/
+
+
+
+
+void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
+{ 
+	// Move General function
+	/**
+	 * Move this unit to EndCord
+	 *
+	 * @param EndCord Position at which unit will be placed
+	 */
+
+	Unit->Rotate(side); // 1
+
+	//TODO: if shields: // maybe check for every unit
+	if (SpearDamage(Unit))
+	{
+		KillUnit(Unit);
+		return;
+	}
+
+
+	UnitAction(SelectedUnit);
+
+	GridManager->ChangeUnitPosition(Unit, EndCord);
+
+	if (SpearDamage(Unit))
+	{//spr czy nie giniemy HegzyEvents.OnUnitMoved(CurrentCord);
+		KillUnit(Unit);
+		return;
+	}
+		
+		
+	UnitAction(SelectedUnit);
+
+}
+
+bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 side)
+{
+	return true;
+}
+
+
+bool AGameplayManager::SpearDamage(AUnit* Target)
+{ // Returns true is Enemy spear can kill the Target
+	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
+
+	for (int32 side = 0; side < 6; side++)
+	{	
+		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
+		{
+
+			if (Target->Symbols[(side - Target->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Do we have a shield?
+			{
+				continue;
+			}
+			
+
+			// Rotation is based on where the unit is pointing toward
+			int32 EnemyWeaponIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
+
+
+			if (Units[side]->Symbols[EnemyWeaponIdx] == ESymbols::SPEAR) // Does enemy has a spear?
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+void AGameplayManager::KillUnit(AUnit* Target)
+{
+	if (Target->Controller == EPlayer::DEFENDER)
+	{
+		DefenderUnits.Remove(Target);
+	}
+	else
+	{
+		AttackerUnits.Remove(Target);
+	}
+	GridManager->RemoveUnit(Target);
+
+	if (DefenderUnits.Num() == 0)
+		PrintString("Attacker won");
+	else if (AttackerUnits.Num() == 0)
+		PrintString("Defender won");
+	
+}
+
+
+void AGameplayManager::UnitAction(AUnit* Unit)
+{
+	TArray<AUnit* > Units = GridManager->AdjacentUnits(Unit->CurrentCord);
+
+	for (int32 side = 0; side < 6; side++)
+	{
+		ESymbols UnitWeapon = Unit->Symbols[(side - Unit->CurrentRotation + 6) % 6];
+		if (UnitWeapon == ESymbols::BOW) // BOW LOGIC
+		{
+			AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, side);
+			if (Target == nullptr)
+				continue;
+
+			if (Target->Controller == Unit->Controller)
+				continue;
+
+			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Target->CurrentRotation + 6) % 6;
+
+
+			if (Target->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+			{
+				KillUnit(Target);
+			}
+			continue;
+		}
+
+		if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)
+		{
+			
+			if (UnitWeapon == ESymbols::SHIELD || UnitWeapon == ESymbols::INVALID)  // Do we have a weapon?
+			{
+				continue;
+			}
+
+			if (UnitWeapon == ESymbols::PUSH)
+			{
+				// PUSH LOGIC
+				EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
+
+				if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
+				{
+					// Kill
+					KillUnit(Units[side]);
+					continue;
+				}
+
+
+				AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
+
+				if (Target == nullptr)
+				{
+					GridManager->ChangeUnitPosition(Units[side], GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+					SpearDamage(Units[side]);
+					// Simple push	
+				}
+				else
+				{
+					KillUnit(Units[side]);
+				}
+				continue;
+			}
+
+			
+
+			// Rotation is based on where the unit is pointing toward
+			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
+
+
+			if (Units[side]->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+			{
+				KillUnit(Units[side]);
+			}
+
+
+		}
+	}
+
+	/*
+	for side in unit:
+	 if side has symbol:
+		szajs = symbol("active")
+		if szajs not null
+			mapa_jednsotek[szajs] = null
+	
+
+	symbol(mapa_jednostek):
+		check if symbol is active:
+
+	*/
+}
+
+
+
+
+#pragma endregion
+
+
+#pragma region Main Functions
 
 
 void AGameplayManager::InputListener(FIntPoint Cord)
@@ -33,7 +266,7 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	{
 		SelectedUnit = NewSelection;
 		PrintString("You have selected a Unit");
-		
+
 		return;
 	}
 	else if (SelectedUnit == nullptr)
@@ -62,78 +295,36 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 
 
-void AGameplayManager::SwitchPlayerTurn()
-{ // Currently works only for 2 players
-	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
-}
-
-
 void AGameplayManager::Gameplay(FIntPoint Cord)
 {
 	PrintString("Gameplay is working");
-	
-	int32 direction;
-	if (IsLegalMove(Cord, direction))
-	{
-		PrintString(FString::Printf(TEXT("DIRECTION_%d"), direction));
-		testKillUnit(Cord);
-		GridManager->ChangeUnitPosition(SelectedUnit, Cord);
 
-		int32 new_direction = (direction) % 6;
-		PrintString(FString::Printf(TEXT("_%d"), new_direction));
-		GridManager->RotateUnit(SelectedUnit, new_direction);
+	int32 side;  // Gets Updated with IsLegalMove()
+	if (IsLegalMove(Cord, side)) // spot is empty + we aren't hitting a shield
+	{
+		// 1 Rotate
+
+		// 2 Check for Spear
+
+		// 3 Actions
+
+		// 4 Move
+
+		// 5 Check for Spear
+
+		// 6 Actions
+		MoveUnit(SelectedUnit, Cord, side);
+		//PrintString(FString::Printf(TEXT("DIRECTION_%d"), side));
+		//testKillUnit(Cord);
+		
+		//GridManager->ChangeUnitPosition(SelectedUnit, Cord);
+		//PrintString(FString::Printf(TEXT("_%d"), side));
+		//->RotateUnit(SelectedUnit, side);
 
 		SwitchPlayerTurn();
 	}
-	
+
 }
-
-
-bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
-{
-	/**
-	 * Function has to check 2 things:
-	 * 1 Target Cord is a Neighbour of a SelectedUnit
-	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
-	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
-	 * 
-	 * @param Cord
-	 * @return 
-	 */
-	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);
-	if (ResultSide == INDEX_NONE)
-		return false;
-
-
-	// 2
-	//if (GridManager->GetUnit(Cord))
-	
-	return true;
-}
-
-
-void AGameplayManager::testKillUnit(FIntPoint Cord)
-{
-	AUnit* NewSelection = GridManager->GetUnit(Cord);
-	if (NewSelection != nullptr && NewSelection->Controller != CurrentPlayer)
-	{
-		if (CurrentPlayer == EPlayer::DEFENDER)
-		{
-			AttackerUnits.Remove(NewSelection);
-		}
-		else
-		{
-			DefenderUnits.Remove(NewSelection);
-		}
-		GridManager->RemoveUnit(NewSelection, Cord);
-
-		if (CurrentPlayer == EPlayer::ATTACKER && DefenderUnits.Num() == 0)
-			PrintString("Attacker won");
-		else if(CurrentPlayer == EPlayer::DEFENDER && AttackerUnits.Num() == 0)
-			PrintString("Defender won");
-	}
-}
-
 
 
 void AGameplayManager::SummonUnit(FIntPoint Cord)
@@ -174,15 +365,22 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
 
 	if (CurrentPlayer == EPlayer::ATTACKER)
-		GridManager->RotateUnit(SelectedUnit, 0);
+		SelectedUnit->Rotate(0);
 	else
-		GridManager->RotateUnit(SelectedUnit, 3);
+		SelectedUnit->Rotate(3);
 
 
 	SwitchPlayerTurn();
 
 	UnitsLeftToBeSummoned--;
 }
+#pragma endregion
+
+#pragma region Tests
+
+
+
+
 
 
 void AGameplayManager::SimpleAutomaticTests()
@@ -191,7 +389,7 @@ void AGameplayManager::SimpleAutomaticTests()
 	{
 		return;
 	}
-	
+
 
 	if (AutomaticTest == EAutomaticTestsList::BASIC_UNIT_SETUP)
 	{
@@ -211,10 +409,12 @@ void AGameplayManager::SimpleAutomaticTests()
 		return;
 	}
 }
+#pragma endregion
 
 
 
 #pragma region GameSetup
+
 
 void AGameplayManager::SpawnUnits()
 {
@@ -258,10 +458,7 @@ void AGameplayManager::SetupGame()
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
 	SimpleAutomaticTests();
-	
 }
-
-
 
 /*
 void AGameplayManager::TimerFunction()
@@ -278,9 +475,12 @@ void AGameplayManager::TimerFunction()
 void AGameplayManager::BeginPlay()
 {
 	SetupGame();
-	
-	
-	
+}
+
+
+AGameplayManager::AGameplayManager()
+{
+	AutomaticTest = EAutomaticTestsList::EMPTY;
 }
 
 #pragma endregion

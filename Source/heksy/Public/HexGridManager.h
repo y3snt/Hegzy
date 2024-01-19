@@ -87,7 +87,57 @@ public:
 	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side
 	FIntPoint AdjacentCord(const FIntPoint& BaseCord, int32 Side); //? TODO add static
 
-	void RemoveUnit(AUnit* Unit, const FIntPoint& Cord);
+
+	/**
+	 * Get a reference to the first Unit hit by a bow.
+	 * 
+	 * @param StartCord
+	 * @param Side
+	 * @return 
+	 */
+	AUnit* GetShotTarget(FIntPoint StartCord, const int32 Side);
+
+	/**
+	 * Get a Unit from a hex tile placed "Distance" tiles away.
+	 * 
+	 * @param StartCord
+	 * @param Side
+	 * @param Distance
+	 * @return 
+	 */
+	AUnit* GetDistantUnit(FIntPoint StartCord, const int32 Side, const int32 Distance);
+
+	/**
+	 * Get a Tile placed "Distance" tiles away from StartCord.
+	 *
+	 * @param StartCord
+	 * @param Side
+	 * @param Distance
+	 * @return
+	 */
+	EHexTileType GetDistantTileType(FIntPoint StartCord, const int32 Side, const int32 Distance);
+
+	/**
+	 * Lists Units around a specific Hex Tile.
+	 * 
+	 * @param BaseCord
+	 * @return Returns 6 elements Array, elements can be nullptr
+	 */
+	TArray<AUnit*> AdjacentUnits(const FIntPoint& BaseCord);
+
+	/**
+	 * .
+	 * 
+	 * @param StartCord
+	 * @param Side
+	 * @param Distance
+	 * @return 
+	 */
+	FIntPoint GetDistantCord(FIntPoint& StartCord, const int32 Side, const int32 Distance);
+
+
+
+	void RemoveUnit(AUnit* Unit);
 
 	void GenerateGrid();
 

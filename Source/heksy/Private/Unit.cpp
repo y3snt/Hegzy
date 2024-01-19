@@ -73,6 +73,7 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  * 
  * @param EndCord Position at which unit will be placed
  */
+ /*
 void AUnit::Move(const FIntPoint& EndCord)
 { 
 	int32 NewDirection = DirectionToSide(EndCord - CurrentCord);  // get direction  ? why neighbour.find
@@ -91,6 +92,7 @@ void AUnit::Move(const FIntPoint& EndCord)
 	//Action(CurrentCord)
 
 }
+*/
 
 /*
 
@@ -100,7 +102,10 @@ void AUnit::Move(const FIntPoint& EndCord)
 4 - lewy tyl
 5 - lewy przod
 
-Unit::Action():
+*/
+
+/*
+AUnit::Action():
 	for i, symbol in enumarate(Symbols[6]):
 		if symbol is activatable:
 			Cord AdjCord = current_cord + direction[i - rotation];

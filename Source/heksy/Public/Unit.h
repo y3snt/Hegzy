@@ -21,7 +21,6 @@
 #include "Unit.generated.h"
 
 
-
 class UStaticMeshComponent;
 
 class UPaperSpriteComponent;
@@ -63,8 +62,10 @@ public:
 protected:
 #pragma region UnitSymbols
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TArray<ASymbol*> Symbols;
+	
+
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	//TArray<ASymbol*> Symbols;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")  // U: property, that will be visible in the editor
 	TSubclassOf <ASymbol> FrontSymbol;
@@ -98,6 +99,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	TArray<ESymbols> Symbols;
+
 
 //	static FIntPoint Direction(int32 Side); //TODO think about how to make it static
 
