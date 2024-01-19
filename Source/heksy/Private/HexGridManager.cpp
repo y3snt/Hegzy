@@ -13,15 +13,6 @@ const TArray<FIntPoint> AHexGridManager::Directions = {
 };
 
 
-// Sets default values
-AHexGridManager::AHexGridManager()
-{
-	GridWidth = 5;
-	GridHeight = 5;
-
-	BorderSize = 1;
-}
-
 
 EHexTileType AHexGridManager::GetTileType(const FIntPoint& Cord) const
 {
@@ -57,13 +48,70 @@ void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
 
 
 
-void AHexGridManager::RemoveUnit(AUnit* Unit, const FIntPoint& Cord)
+void AHexGridManager::RemoveUnit(AUnit* Unit)
 {
+	FIntPoint Cord = Unit->CurrentCord;
 	UnitGrid[Cord.X][Cord.Y] = nullptr; // Remove unit from gameplay grid
 
 	//Unit->SetActorLocation(HexGrid[0][0]->GetActorLocation());
 	Unit->Destroy();
 }
+
+#pragma region Coordinates tools
+
+TArray<AUnit*> AHexGridManager::AdjacentUnits(const FIntPoint& BaseCord)
+{ // Returns 6 elements Array, elements can be nullptr
+	TArray<AUnit* > Units;
+	for (int side = 0; side < 6; side++)
+	{
+		FIntPoint Cord = AdjacentCord(BaseCord, side);
+		AUnit* Neighbour = UnitGrid[Cord.X][Cord.Y];
+		//if (Neighbour != nullptr)
+		Units.Add(Neighbour);
+	}
+	return Units;
+}
+
+AUnit* AHexGridManager::GetShotTarget(FIntPoint StartCord, const int32 Side)
+{
+	while (HexGrid[StartCord.X][StartCord.Y]->TileType != EHexTileType::SENTINEL)
+	{
+		StartCord += Directions[Side];
+		AUnit* Target = UnitGrid[StartCord.X][StartCord.Y];
+		if (Target != nullptr)
+			return Target;
+	} 
+	return nullptr;
+}
+
+AUnit* AHexGridManager::GetDistantUnit(FIntPoint StartCord, const int32 Side, const int32 Distance)
+{
+	for (int32 i = 0; i < Distance; i++)
+	{
+		StartCord += Directions[Side];
+	}
+	return UnitGrid[StartCord.X][StartCord.Y];
+}
+
+EHexTileType AHexGridManager::GetDistantTileType(FIntPoint StartCord, const int32 Side, const int32 Distance)
+{
+	for (int32 i = 0; i < Distance; i++)
+	{
+		StartCord += Directions[Side];
+	}
+	return HexGrid[StartCord.X][StartCord.Y]->TileType;
+}
+
+FIntPoint AHexGridManager::GetDistantCord(FIntPoint& StartCord, const int32 Side, const int32 Distance)
+{
+	FIntPoint NewCord = StartCord;
+	for (int32 i = 0; i < Distance; i++)
+	{
+		NewCord += Directions[Side];
+	}
+	return NewCord;
+}
+
 
 
 bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
@@ -113,7 +161,7 @@ FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, const FIntPoi
 	//return BaseCord + Directions[Side];
 //}
 
-
+#pragma endregion
 
 #pragma region GenerateGrid
 
@@ -271,6 +319,18 @@ void AHexGridManager::BeginPlay()
 {
 	//GenerateGrid();
 }
+
+// Sets default values
+AHexGridManager::AHexGridManager()
+{
+	GridWidth = 5;
+	GridHeight = 5;
+
+	BorderSize = 1;
+}
+
+
+
 
 #pragma endregion
 

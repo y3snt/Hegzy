@@ -32,6 +32,18 @@ enum class EPlayer : uint8  // __ why uint?
 	MAX UMETA(Hidden)  // __ ???
 };
 
+UENUM()
+enum class ESymbols : uint8  // __ why uint?
+{
+	INVALID,
+	SPEAR,
+	SWORD,
+	SHIELD,
+	BOW,
+	PUSH,
+	MAX UMETA(Hidden)  // __ ???
+};
+
 /*
 class HEKSY_API GameplayEnums
 {
