@@ -87,6 +87,8 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 
 
 	UnitAction(SelectedUnit);
+	//TODO wait half a second
+
 
 	GridManager->ChangeUnitPosition(Unit, EndCord);
 
@@ -163,74 +165,76 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 	for (int32 side = 0; side < 6; side++)
 	{
 		ESymbols UnitWeapon = Unit->Symbols[(side - Unit->CurrentRotation + 6) % 6];
-		if (UnitWeapon == ESymbols::BOW) // BOW LOGIC
+
+		switch (UnitWeapon)
 		{
-			AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, side);
-			if (Target == nullptr)
-				continue;
+			case ESymbols::INVALID: 
+			case ESymbols::SHIELD:
+				break; // We don't have a weapon
 
-			if (Target->Controller == Unit->Controller)
-				continue;
-
-			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Target->CurrentRotation + 6) % 6;
-
-
-			if (Target->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+			case ESymbols::BOW:
 			{
-				KillUnit(Target);
-			}
-			continue;
-		}
-
-		if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)
-		{
-			
-			if (UnitWeapon == ESymbols::SHIELD || UnitWeapon == ESymbols::INVALID)  // Do we have a weapon?
-			{
-				continue;
-			}
-
-			if (UnitWeapon == ESymbols::PUSH)
-			{
-				// PUSH LOGIC
-				EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-
-				if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
-				{
-					// Kill
-					KillUnit(Units[side]);
-					continue;
-				}
-
-
-				AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
-
+				AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, side);
 				if (Target == nullptr)
-				{
-					GridManager->ChangeUnitPosition(Units[side], GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-					SpearDamage(Units[side]);
-					// Simple push	
-				}
-				else
-				{
-					KillUnit(Units[side]);
-				}
-				continue;
-			}
+					break;
 
+				if (Target->Controller == Unit->Controller)
+					break;
+
+				int32 EnemyDefenseIdx = (side + 3 - Target->CurrentRotation + 6) % 6;
+
+
+				if (Target->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+				{
+					KillUnit(Target);
+				}
+				break;
+			}
 			
-
-			// Rotation is based on where the unit is pointing toward
-			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
-
-
-			if (Units[side]->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+			default:
 			{
-				KillUnit(Units[side]);
+				if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)
+				{
+					if (UnitWeapon == ESymbols::PUSH)
+					{
+						// PUSH LOGIC
+						EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
+
+						if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
+						{
+							// Kill
+							KillUnit(Units[side]);
+							break;
+						}
+
+
+						AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
+
+						if (Target == nullptr)
+						{
+							GridManager->ChangeUnitPosition(Units[side], GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+							SpearDamage(Units[side]);
+							// Simple push	
+						}
+						else
+						{
+							KillUnit(Units[side]);
+						}
+						break;
+					}
+
+
+					// Rotation is based on where the unit is pointing toward
+					int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
+
+					if (Units[side]->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+					{
+						KillUnit(Units[side]);
+					}
+				}
 			}
-
-
 		}
+
 	}
 
 	/*
@@ -457,7 +461,9 @@ void AGameplayManager::SetupGame()
 	SpawnUnits();
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
-	SimpleAutomaticTests();
+	
+	
+	//SimpleAutomaticTests();
 }
 
 /*
