@@ -261,18 +261,8 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	FString output = Cord.ToString();
 	PrintString(output);
 
-	AUnit* NewSelection = GridManager->GetUnit(Cord);
-	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
-	{
-		SelectedUnit = NewSelection;
-		PrintString("You have selected a Unit");
-
+	if(SelectUnit(Cord) || SelectedUnit == nullptr) 
 		return;
-	}
-	else if (SelectedUnit == nullptr)
-	{
-		return;
-	}
 
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
@@ -292,6 +282,24 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 }
 
 
+bool SelectUnit(const FIntPoint& Cord) {
+	/**
+	 * Select friendly Unit on a given Cord
+	 * 
+	 * @return true if unit has been selected in this operation
+	 */
+
+	AUnit* NewSelection = GridManager->GetUnit(Cord);
+	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
+	{
+		SelectedUnit = NewSelection;
+		PrintString("You have selected a Unit");
+
+		return true;
+	}
+
+	return false;
+}
 
 
 
