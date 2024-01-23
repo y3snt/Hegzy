@@ -87,7 +87,7 @@ public:
 
 
 	
-	bool SpearDamage(AUnit* Target);
+	bool EnemyDamage(AUnit* Target);
 
 	void MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side);
 

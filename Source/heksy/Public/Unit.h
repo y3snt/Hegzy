@@ -16,7 +16,7 @@
 //#include "HegzEvent.cpp" //aa
 
 
-//#include "C:/Users/tomek/Documents/GitHub/CPP/Heksy   /Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperSpriteComponent.h”
+//#include "C:/Users/tomek/Documents/GitHub/CPP/Heksy   /Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperSpriteComponent.hï¿½
 
 #include "Unit.generated.h"
 
@@ -137,6 +137,8 @@ public:
 
 	
 	void Rotate(int32 Side);
+
+	ESymbols GetSymbol(int32 side);
 	
 
 

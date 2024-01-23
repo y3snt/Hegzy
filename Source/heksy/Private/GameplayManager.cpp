@@ -46,9 +46,8 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
 		return false;
 
-
-	int32 AdjacentEnemySide = (((ResultSide + 3 + 6) % 6) - EnemyUnit->CurrentRotation + 6) % 6; // TODO: move this equation to a function and refactor
-	if (EnemyUnit->Symbols[AdjacentEnemySide] == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
+	ESymbols EnemySymbol = EnemyUnit.GetSymbol(side + 3);
+	if (EnemySymbol == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
 		return false;
 
 	return true;
@@ -63,8 +62,6 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 */
 
 
-
-
 void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
 { 
 	// Move General function
@@ -77,23 +74,21 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 	Unit->Rotate(side); // 1
 
 	//TODO: if shields: // maybe check for every unit
-	if (SpearDamage(Unit))
+	if (EnemyDamage(Unit))
 	{
 		KillUnit(Unit);
 		return;
 	}
 
-
 	UnitAction(SelectedUnit);
 
 	GridManager->ChangeUnitPosition(Unit, EndCord);
 
-	if (SpearDamage(Unit))
+	if (EnemyDamage(Unit))
 	{//spr czy nie giniemy HegzyEvents.OnUnitMoved(CurrentCord);
 		KillUnit(Unit);
 		return;
 	}
-		
 		
 	UnitAction(SelectedUnit);
 
@@ -105,34 +100,27 @@ bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 s
 }
 
 
-bool AGameplayManager::SpearDamage(AUnit* Target)
+bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
 
-	for (int32 side = 0; side < 6; side++)
+	for (int32 side = 0; side < 6; side++) 
 	{	
 		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
 		{
 
-			if (Target->Symbols[(side - Target->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Do we have a shield?
-			{
+			ESymbols TargetSymbol = Target.GetSymbol(side);  // TODO: ew. check if !nullptr
+			if (TargetSymbol == ESymbols::SHIELD)  // Do we have a shield?
 				continue;
-			}
 			
-
-			// Rotation is based on where the unit is pointing toward
-			int32 EnemyWeaponIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
-
-
-			if (Units[side]->Symbols[EnemyWeaponIdx] == ESymbols::SPEAR) // Does enemy has a spear?
-			{
+			Esymbols EnemySymbol = Units[side].GetSymbol(side + 3);  // TODO: ew. check if !nullptr
+			if (EnemySymbol == ESymbols::SPEAR)  // Does enemy have a spear?
 				return true;
-			}
+
 		}
 	}
 	return false;
 }
-
 
 void AGameplayManager::KillUnit(AUnit* Target)
 {
@@ -160,73 +148,52 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 
 	for (int32 side = 0; side < 6; side++)
 	{
-		ESymbols UnitWeapon = Unit->Symbols[(side - Unit->CurrentRotation + 6) % 6];
-		if (UnitWeapon == ESymbols::BOW) // BOW LOGIC
+		ESymbols UnitSymbol = Unit.GetSymbol(side);
+
+		// BOW LOGIC
+		if (UnitSymbol == ESymbols::BOW)
 		{
 			AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, side);
-			if (Target == nullptr)
+			if (Target == nullptr || Target->Controller == Unit->Controller)
 				continue;
 
-			if (Target->Controller == Unit->Controller)
-				continue;
-
-			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Target->CurrentRotation + 6) % 6;
-
-
-			if (Target->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
-			{
+			ESymbols EnemySymbol = Target->GetSymbol(side + 3);  // TODO: rename to ESymbol
+			if (EnemySymbol != ESymbols::SHIELD) // Does Enemy has a shield?
 				KillUnit(Target);
-			}
-			continue;
+
 		}
-
-		if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)
+		else if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)  // Enemy unit on the adjacent cord
 		{
-			
-			if (UnitWeapon == ESymbols::SHIELD || UnitWeapon == ESymbols::INVALID)  // Do we have a weapon?
-			{
-				continue;
-			}
+			AUnit EnemyUnit = Units[side];
 
-			if (UnitWeapon == ESymbols::PUSH)
+			// PUSH LOGIC
+			if (UnitSymbol == ESymbols::PUSH)
 			{
-				// PUSH LOGIC
 				EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-
-				if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
-				{
-					// Kill
-					KillUnit(Units[side]);
-					continue;
-				}
-
-
 				AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
 
-				if (Target == nullptr)
+				if (TargetTileType == EHexTileType::SENTINEL || Target != nullptr)  // Pushing outside the map or in the Unit
 				{
-					GridManager->ChangeUnitPosition(Units[side], GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-					SpearDamage(Units[side]);
-					// Simple push	
+					KillUnit(EnemyUnit);
 				}
-				else
+				else if (Target == nullptr) // Simple push
 				{
-					KillUnit(Units[side]);
+					GridManager->ChangeUnitPosition(EnemyUnit, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+					SpearDamage(EnemyUnit);
 				}
 				continue;
 			}
 
 			
+			// ATTACK LOGIC (SPEAR OR SWORD)
+			if (UnitSymbol == ESymbols::SHIELD || UnitSymbol == ESymbols::INVALID)  // Do we have a weapon?  TODO: if of type attackable / has tag ...
+				continue;
 
-			// Rotation is based on where the unit is pointing toward
-			int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
-
-
-			if (Units[side]->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+			Esymbols EnemySymbol = EnemyUnit.GetSymbol(side + 3);
+			if (EnemySymbol != ESymbols::SHIELD) // Does Enemy has a shield?
 			{
-				KillUnit(Units[side]);
+				KillUnit(EnemyUnit);
 			}
-
 
 		}
 	}
@@ -244,8 +211,6 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 
 	*/
 }
-
-
 
 
 #pragma endregion
@@ -370,7 +335,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	// TeleportUnit(Cord);
 	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
 
-	if (CurrentPlayer == EPlayer::ATTACKER)  // ?? Move to setup
+	if (CurrentPlayer == EPlayer::ATTACKER)  // TODO: Move to setup
 		SelectedUnit->Rotate(0);
 	else
 		SelectedUnit->Rotate(3);

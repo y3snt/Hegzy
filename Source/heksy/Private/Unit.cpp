@@ -68,6 +68,19 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//Super::SetupPlayerInputComponent(PlayerInputComponent);  //TODO fix it
 }
 
+
+ESymbols AUnit::GetSymbol(int32 side) { 
+	/**
+	 * Get the Symbol on a given side of Unit.
+	 * 
+	 * @param side must be absolute side of a hex tile (0-5)
+	 * @return ESymbols 
+	 * 
+	 * @note converts absolute hex side to loacal unit side (applying unit rotation)
+	 */
+	return Symbols[(side - CurrentRotation + 6) % 6];
+}
+
 /**
  * Move this unit to EndCord
  * 
