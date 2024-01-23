@@ -124,7 +124,7 @@ bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
 int32 AHexGridManager::AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2)
 {	
 	/**
-	* Return shared side between Cord1 and Cord2
+	* Return shared side between Cord1 and Cord2, if the Cords are adjacent
 	* 
 	* @param Cord1 
 	* @param Cord2 

@@ -26,23 +26,19 @@ void AGameplayManager::SwitchPlayerTurn()
 bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 {
 	/**
-	 * Function has to check 2 things:
-	 * 1 Target Cord is a Neighbour of a SelectedUnit
-	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
 	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
 	 * 
 	 * @param Cord
-	 * @return 
+	 * @return true if selected Unit can move on a given Cord
 	 */
 
-	// 1
-	// returns an integer (side), if the cord is adjacent
+
+	// Check if Cord is a neighbour of a SelectedUnit
 	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
 
-
-	// 2
+	// TODO: Check if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
 	AUnit* EnemyUnit = GridManager->GetUnit(Cord);
 	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
 		return true;
@@ -50,7 +46,9 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
 		return false;
 
-	if (EnemyUnit->Symbols[(((ResultSide + 3 + 6) % 6) - EnemyUnit->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
+
+	int32 AdjacentEnemySide = (((ResultSide + 3 + 6) % 6) - EnemyUnit->CurrentRotation + 6) % 6; // TODO: move this equation to a function and refactor
+	if (EnemyUnit->Symbols[AdjacentEnemySide] == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
 		return false;
 
 	return true;
@@ -372,7 +370,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	// TeleportUnit(Cord);
 	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
 
-	if (CurrentPlayer == EPlayer::ATTACKER)
+	if (CurrentPlayer == EPlayer::ATTACKER)  // ?? Move to setup
 		SelectedUnit->Rotate(0);
 	else
 		SelectedUnit->Rotate(3);
