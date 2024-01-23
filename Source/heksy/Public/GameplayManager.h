@@ -53,6 +53,7 @@ protected:
 	EAutomaticTestsList AutomaticTest;
 
 	void SimpleAutomaticTests();
+	bool SelectUnit(const FIntPoint& Cord);
 
 public:
 
