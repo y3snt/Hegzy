@@ -26,14 +26,17 @@ void AGameplayManager::SwitchPlayerTurn()
 bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 {
 	/**
-	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
+	 * Check if SelectedUnit can move to a given cord
 	 * 
 	 * @param Cord
 	 * @return true if selected Unit can move on a given Cord
+	 * @note If a Cord is adjacent, ajdacent side will be assigned in ResultSide
 	 */
 
+	// Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
 
 	// Check if Cord is a neighbour of a SelectedUnit
+	// TODO: ? move to listener, so only tiles adj to current unit can be selected in gameplay phase
 	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
@@ -43,16 +46,14 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
 		return true;
 
-	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
-		return false;
-
-	ESymbols EnemySymbol = EnemyUnit->GetSymbol(ResultSide + 3);
-	if (EnemySymbol == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
+	// checking if can attack from the front, cause SelectedUnit will rotate first
+	
+	int32 EnemySide = GridManager.AdjacentCordSide(ResultSide);
+	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide))
 		return false;
 
 	return true;
 }
-
 
 
 /* TODO
@@ -107,12 +108,12 @@ bool AGameplayManager::EnemyDamage(AUnit* Target)
 	for (int32 side = 0; side < 6; side++) 
 	{	
 		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
-		{
-
-			ESymbols TargetSymbol = Target->GetSymbol(side);  // TODO: ew. check if !nullptr
-			if (TargetSymbol == ESymbols::SHIELD)  // Do we have a shield?
+		{	
+			// TODO: ew. check if target !nullptr
+			if(Target->CanDefend(side)) 
 				continue;
 			
+			// TODO: perform passive action 
 			ESymbols EnemySymbol = Units[side]->GetSymbol(side + 3);  // TODO: ew. check if !nullptr
 			if (EnemySymbol == ESymbols::SPEAR)  // Does enemy have a spear?
 				return true;
@@ -134,6 +135,7 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	}
 	GridManager->RemoveUnit(Target);
 
+	// TODO: Not here!  ? decorators
 	if (DefenderUnits.Num() == 0)
 		PrintString("Attacker won");
 	else if (AttackerUnits.Num() == 0)
@@ -150,52 +152,17 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 	{
 		ESymbols UnitSymbol = Unit->GetSymbol(side);
 
-		// BOW LOGIC
 		if (UnitSymbol == ESymbols::BOW)
 		{
-			AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, side);
-			if (Target == nullptr || Target->Controller == Unit->Controller)
-				continue;
-
-			ESymbols EnemySymbol = Target->GetSymbol(side + 3);  // TODO: rename to ESymbol
-			if (EnemySymbol != ESymbols::SHIELD) // Does Enemy has a shield?
-				KillUnit(Target);
-
+			Bow_Action(Unit, side);
 		}
-		else if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)  // Enemy unit on the adjacent cord
+		else if (UnitSymbol == ESymbols::PUSH) 
 		{
-			AUnit* EnemyUnit = Units[side];
-
-			// PUSH LOGIC
-			if (UnitSymbol == ESymbols::PUSH)
-			{
-				EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-				AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
-
-				if (TargetTileType == EHexTileType::SENTINEL || Target != nullptr)  // Pushing outside the map or in the Unit
-				{
-					KillUnit(EnemyUnit);
-				}
-				else if (Target == nullptr) // Simple push
-				{
-					GridManager->ChangeUnitPosition(EnemyUnit, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-					if (EnemyDamage(EnemyUnit))
-						KillUnit(EnemyUnit);
-				}
-				continue;
-			}
-
-			
-			// ATTACK LOGIC (SPEAR OR SWORD)
-			if (UnitSymbol == ESymbols::SHIELD || UnitSymbol == ESymbols::INVALID)  // Do we have a weapon?  TODO: if of type attackable / has tag ...
-				continue;
-
-			ESymbols EnemySymbol = EnemyUnit->GetSymbol(side + 3);
-			if (EnemySymbol != ESymbols::SHIELD) // Does Enemy has a shield?
-			{
-				KillUnit(EnemyUnit);
-			}
-
+			Push_Action(Unit, Side);
+		}
+		else if (UnitSymbol == ESymbols::SPEAR || UnitSymbol == ESymbols::SWORD)  // Enemy unit on the adjacent cord
+		{
+			Spear_Action(Unit, Side);
 		}
 	}
 
@@ -213,6 +180,52 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 	*/
 }
 
+void Bow_Action(AUnit* Unit, int32 Side) {
+	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
+	if (Target != nullptr && Target->Controller != Unit->Controller)
+		AttackUnit(Target, Side);
+}
+
+// Adjacent Attack
+void Spear_Action(AUnit* Unit, int32 Side) {
+	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		AttackUnit(Target, Side);
+}
+
+void Sword_Action(AUnit* Unit, int32 Side) {
+	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		AttackUnit(Target, Side);
+}
+
+void Push_Action(AUnit* Unit, int32 Side) {
+	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	if(!Target || Target->Controller == Unit->Controller)
+		return;
+
+	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
+	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
+
+	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
+	if (BehindUnit != nullptr || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
+	{
+		KillUnit(Target);
+	}
+	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
+	{
+		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+		if (EnemyDamage(Target))  // TODO: should be passive
+			KillUnit(Target);
+	}
+}
+
+// maybe CanDefend(attacking side) vs HasDefense(unit side)
+
+void AttackUnit(AUnit* Target, int32 AttackSide) {
+	if(!Target.CanDefend(AttackSide + 3))
+		KillUnit(Target);
+}
 
 #pragma endregion
 

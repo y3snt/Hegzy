@@ -124,12 +124,12 @@ bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
 int32 AHexGridManager::AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2)
 {	
 	/**
-	* Return shared side between Cord1 and Cord2, if the Cords are adjacent
+	* Return shared side between Cord1 and Cord2, if Cords are adjacent
 	* 
 	* @param Cord1 
 	* @param Cord2 
-	* @return int32 Side
-	* @note INDEX_NONE is return, when Cord1 and Cord2 don't have shared side
+	* @return int32 Side number | INDEX_NONE 
+	* @note INDEX_NONE is returned, when Cord1 and Cord2 don't have shared side
 	*/
 	return Directions.Find(Cord2 - Cord1);
 }
@@ -145,6 +145,23 @@ FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, int32 Side)
 	 * @return FIntPoint Cord adjacent to BaseCord
 	 */
 	return BaseCord + Directions[Side];
+}
+
+static int32 AHexGridManager::AdjacentCordSide(int32 Side)
+{
+	/**
+	 * Convert side of a cord to its corresponding adjacent cord side
+	 * ex. 2 -> 5   //  (current cord side) -> (adjacent cord side)
+	 * ___               
+	 *    \___          
+	 * __2/5  \     
+	 *    \___/     
+	 *     
+	 * @param Side side number of current cord
+	 * @return side number of a cord, which shares a side with a current cord
+	 */
+
+	return Side + 3;
 }
 
 /* Maybe TODO

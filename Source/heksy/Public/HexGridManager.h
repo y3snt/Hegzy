@@ -86,6 +86,7 @@ public:
 	bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
 	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side
 	FIntPoint AdjacentCord(const FIntPoint& BaseCord, int32 Side); //? TODO add static
+	static int32 AdjacentCordSide(int32 Side);
 
 
 	/**

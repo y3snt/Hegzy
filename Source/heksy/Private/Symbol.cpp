@@ -59,7 +59,7 @@ Unit:
 
 // ==== Symbole DEMO =====
 /*	
-W?ócznia
+W?ï¿½cznia
 	Action()
 	PassiveAction()
 

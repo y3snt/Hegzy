@@ -69,9 +69,18 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
+ESymbols AUnit::GetFrontSymbol() { 
+	/**
+	 * Get Symbol on a front of the Unit
+	 * 
+	 * @return ESymbols
+	 */
+	return Symbols[0];
+}
+
 ESymbols AUnit::GetSymbol(int32 side) { 
 	/**
-	 * Get the Symbol on a given side of Unit.
+	 * Get the Symbol on a given side of Unit
 	 * 
 	 * @param side must be absolute side of a hex tile (0-5)
 	 * @return ESymbols 
@@ -79,6 +88,43 @@ ESymbols AUnit::GetSymbol(int32 side) {
 	 * @note converts absolute hex side to loacal unit side (applying unit rotation)
 	 */
 	return Symbols[(side - CurrentRotation + 6) % 6];
+}
+
+bool AUnit::CanAttack()
+{
+	/**
+	 * Return true if Unit can perform an attack from the front side
+	 * 
+	 * @return true if can attack
+	 * @note returns true if action performed by the Unit can kill or move an enemy
+	 */
+	
+	// Active == can affect unit
+	TArray<FIntPoint> AttackSymbols = {
+		ESymbols::SWORD,
+		ESymbols::SPEAR,
+		ESymbols::PUSH,
+		ESymbols::BOW
+	};
+
+	return AttackSymbols.Find(GetFrontSymbol()) != INDEX_NONE;
+}
+
+
+bool AUnit::CanDefend(int32 Side)
+{
+	/**
+	 * Return true if Unit can block action from given Side
+	 * 
+	 * @param Side of a Unit, from which it could perform a block
+	 * @return true if can block
+	 */
+	
+	ESymbols Symbol = GetSymbol(Side);
+	if (Symbol == ESymbols::SHIELD)  // Does Unit have a shield?
+		return true;
+	
+	return false;
 }
 
 /**
