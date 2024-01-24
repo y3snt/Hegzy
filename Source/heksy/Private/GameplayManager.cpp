@@ -46,7 +46,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
 		return false;
 
-	ESymbols EnemySymbol = EnemyUnit.GetSymbol(side + 3);
+	ESymbols EnemySymbol = EnemyUnit->GetSymbol(ResultSide + 3);
 	if (EnemySymbol == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
 		return false;
 
@@ -109,11 +109,11 @@ bool AGameplayManager::EnemyDamage(AUnit* Target)
 		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
 		{
 
-			ESymbols TargetSymbol = Target.GetSymbol(side);  // TODO: ew. check if !nullptr
+			ESymbols TargetSymbol = Target->GetSymbol(side);  // TODO: ew. check if !nullptr
 			if (TargetSymbol == ESymbols::SHIELD)  // Do we have a shield?
 				continue;
 			
-			Esymbols EnemySymbol = Units[side].GetSymbol(side + 3);  // TODO: ew. check if !nullptr
+			ESymbols EnemySymbol = Units[side]->GetSymbol(side + 3);  // TODO: ew. check if !nullptr
 			if (EnemySymbol == ESymbols::SPEAR)  // Does enemy have a spear?
 				return true;
 
@@ -148,7 +148,7 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 
 	for (int32 side = 0; side < 6; side++)
 	{
-		ESymbols UnitSymbol = Unit.GetSymbol(side);
+		ESymbols UnitSymbol = Unit->GetSymbol(side);
 
 		// BOW LOGIC
 		if (UnitSymbol == ESymbols::BOW)
@@ -164,7 +164,7 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 		}
 		else if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)  // Enemy unit on the adjacent cord
 		{
-			AUnit EnemyUnit = Units[side];
+			AUnit* EnemyUnit = Units[side];
 
 			// PUSH LOGIC
 			if (UnitSymbol == ESymbols::PUSH)
@@ -179,7 +179,8 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 				else if (Target == nullptr) // Simple push
 				{
 					GridManager->ChangeUnitPosition(EnemyUnit, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-					SpearDamage(EnemyUnit);
+					if (EnemyDamage(EnemyUnit))
+						KillUnit(EnemyUnit);
 				}
 				continue;
 			}
@@ -189,7 +190,7 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 			if (UnitSymbol == ESymbols::SHIELD || UnitSymbol == ESymbols::INVALID)  // Do we have a weapon?  TODO: if of type attackable / has tag ...
 				continue;
 
-			Esymbols EnemySymbol = EnemyUnit.GetSymbol(side + 3);
+			ESymbols EnemySymbol = EnemyUnit->GetSymbol(side + 3);
 			if (EnemySymbol != ESymbols::SHIELD) // Does Enemy has a shield?
 			{
 				KillUnit(EnemyUnit);
@@ -224,8 +225,8 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	FString output = Cord.ToString();
 	PrintString(output);
 
-	if(SelectUnit(Cord) || SelectedUnit == nullptr) 
-		return;
+	if(SelectUnit(Cord) || SelectedUnit == nullptr)
+		return; // selected a new unit || wrong input which didn't select any ally unit
 
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
@@ -245,7 +246,7 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 }
 
 
-bool SelectUnit(const FIntPoint& Cord) {
+bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
 	/**
 	 * Select friendly Unit on a given Cord
 	 * 
