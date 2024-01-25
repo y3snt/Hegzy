@@ -10,8 +10,11 @@
  * GridManager - is a tool used to manage the map
  */
 
-
 #include "GameplayManager.h"
+
+#include "GameplayHeader.h"
+
+
 
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 

@@ -3,6 +3,8 @@
 
 #include "Symbol.h"
 
+#include "GameplayManager.h"
+
 // Sets default values
 ASymbol::ASymbol()
 {
@@ -15,6 +17,15 @@ void ASymbol::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
+
+
+void xdfunction()
+{
+
+}
+
+
 
 #pragma region ComponentTheory
 /*

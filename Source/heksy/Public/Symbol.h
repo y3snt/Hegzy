@@ -2,8 +2,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+//#include "CoreMinimal.h"
+//#include "GameFramework/Actor.h"
+
+#include "GameplayHeader.h"
+
+
 #include "Symbol.generated.h"
 
 UCLASS()
@@ -14,6 +18,8 @@ class HEKSY_API ASymbol : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASymbol();
+
+	void xdfunction();
 
 protected:
 	// Called when the game starts or when spawned
