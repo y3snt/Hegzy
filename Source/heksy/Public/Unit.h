@@ -56,7 +56,7 @@ public:
 
 	void Move(const FIntPoint& EndCord);
 
-	
+	ESymbols GetSymbol(int32 side);
 
 
 protected:

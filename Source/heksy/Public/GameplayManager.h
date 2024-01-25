@@ -78,6 +78,13 @@ public:
 
 	void Gameplay(FIntPoint Cord);
 
+	/**
+	 * Support method for MoveUnit.
+	 * 
+	 * @param Cord
+	 * @param ResultSide
+	 * @return True if selected Unit can move on a given Cord
+	 */
 	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
 	bool SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 side);
@@ -86,11 +93,14 @@ public:
 
 
 	
-	bool SpearDamage(AUnit* Target);
+	bool EnemyDamage(AUnit* Target);
 
 	void MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side);
 
 	void UnitAction(AUnit* Unit);
+
+	bool SelectUnit(const FIntPoint& Cord);
+
 	/*
 	void TimerFunction();
 	FTimerHandle TimerHandle;

@@ -26,17 +26,17 @@ void AGameplayManager::SwitchPlayerTurn()
 bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 {
 	/**
-	 * Function has to check 2 things:
+	 Function checks 2 things:
 	 * 1 Target Cord is a Neighbour of a SelectedUnit
 	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
-	 * Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
+	 *	 Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
 	 * 
 	 * @param Cord
-	 * @return 
+	 * @param ResultSide
+	 * @return True if selected Unit can move on a given Cord
 	 */
 
 	// 1
-	// returns an integer (side), if the cord is adjacent
 	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
@@ -47,24 +47,21 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
 		return true;
 
-	if (SelectedUnit->Symbols[0] == ESymbols::SHIELD)  // Can SelectedUnit kill EnemyUnit?
-		return false;
+	switch (SelectedUnit->Symbols[0])
+	{
+		case ESymbols::INVALID:
+		case ESymbols::SHIELD:
+			return false; // SelectedUnit can't deal with EnemyUnit
+		case ESymbols::PUSH:
+			return true; // SelectedUnit ignores EnemyUnit Shield
+	}
 
-	if (EnemyUnit->Symbols[(((ResultSide + 3 + 6) % 6) - EnemyUnit->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Does EnemyUnit has a shield?
+	// Does EnemyUnit has a shield?
+	if (EnemyUnit->GetSymbol(ResultSide + 3) == ESymbols::SHIELD)
 		return false;
 
 	return true;
 }
-
-
-
-/* TODO
-1 Action
-2 Check for Spear Damage
-3 Check for shield in IsLegalMove
-*/
-
-
 
 
 void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
@@ -79,7 +76,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 	Unit->Rotate(side); // 1
 
 	//TODO: if shields: // maybe check for every unit
-	if (SpearDamage(Unit))
+	if (EnemyDamage(Unit))
 	{
 		KillUnit(Unit);
 		return;
@@ -92,7 +89,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 
 	GridManager->ChangeUnitPosition(Unit, EndCord);
 
-	if (SpearDamage(Unit))
+	if (EnemyDamage(Unit))
 	{//spr czy nie giniemy HegzyEvents.OnUnitMoved(CurrentCord);
 		KillUnit(Unit);
 		return;
@@ -109,7 +106,7 @@ bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 s
 }
 
 
-bool AGameplayManager::SpearDamage(AUnit* Target)
+bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
 
@@ -118,17 +115,12 @@ bool AGameplayManager::SpearDamage(AUnit* Target)
 		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
 		{
 
-			if (Target->Symbols[(side - Target->CurrentRotation + 6) % 6] == ESymbols::SHIELD)  // Do we have a shield?
+			if (Target->GetSymbol(side) == ESymbols::SHIELD)  // Do we have a shield?
 			{
 				continue;
 			}
-			
 
-			// Rotation is based on where the unit is pointing toward
-			int32 EnemyWeaponIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
-
-
-			if (Units[side]->Symbols[EnemyWeaponIdx] == ESymbols::SPEAR) // Does enemy has a spear?
+			if (Units[side]->GetSymbol(side + 3) == ESymbols::SPEAR) // Does enemy has a spear?
 			{
 				return true;
 			}
@@ -164,7 +156,7 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 
 	for (int32 side = 0; side < 6; side++)
 	{
-		ESymbols UnitWeapon = Unit->Symbols[(side - Unit->CurrentRotation + 6) % 6];
+		ESymbols UnitWeapon = Unit->GetSymbol(side);
 
 		switch (UnitWeapon)
 		{
@@ -181,10 +173,8 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 				if (Target->Controller == Unit->Controller)
 					break;
 
-				int32 EnemyDefenseIdx = (side + 3 - Target->CurrentRotation + 6) % 6;
 
-
-				if (Target->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+				if (Target->GetSymbol(side + 3) != ESymbols::SHIELD) // Does Enemy has a shield?
 				{
 					KillUnit(Target);
 				}
@@ -193,66 +183,77 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 			
 			default:
 			{
-				if (Units[side] != nullptr && Units[side]->Controller != Unit->Controller)
+				if (Units[side] == nullptr || Units[side]->Controller == Unit->Controller)
+				{ // no one to hit
+					break;
+				}
+
+				AUnit* EnemyUnit = Units[side];
+
+				if (UnitWeapon == ESymbols::PUSH)
 				{
-					if (UnitWeapon == ESymbols::PUSH)
+					// PUSH LOGIC
+					EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
+
+					if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
 					{
-						// PUSH LOGIC
-						EHexTileType TargetTileType = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-
-						if (TargetTileType == EHexTileType::SENTINEL)  // Pushing outside the map
-						{
-							// Kill
-							KillUnit(Units[side]);
-							break;
-						}
-
-
-						AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
-
-						if (Target == nullptr)
-						{
-							GridManager->ChangeUnitPosition(Units[side], GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-							SpearDamage(Units[side]);
-							// Simple push	
-						}
-						else
-						{
-							KillUnit(Units[side]);
-						}
+						// Kill
+						KillUnit(EnemyUnit);
 						break;
 					}
 
 
-					// Rotation is based on where the unit is pointing toward
-					int32 EnemyDefenseIdx = (((side + 3 + 6) % 6) - Units[side]->CurrentRotation + 6) % 6;
+					AUnit* Target = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
 
-					if (Units[side]->Symbols[EnemyDefenseIdx] != ESymbols::SHIELD) // Does Enemy has a shield?
+					if (Target != nullptr) // Spot isn't empty
 					{
-						KillUnit(Units[side]);
+						KillUnit(EnemyUnit);
+						break;
 					}
+
+					GridManager->ChangeUnitPosition(EnemyUnit, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+					if (EnemyDamage(EnemyUnit)) // Simple push	
+					{
+						KillUnit(EnemyUnit);
+					}
+					break;
 				}
+
+
+				// Rotation is based on where the unit is pointing toward
+
+
+				if (EnemyUnit->GetSymbol(side + 3) != ESymbols::SHIELD) // Does Enemy has a shield?
+				{
+					KillUnit(Units[side]);
+				}
+				
 			}
 		}
 
 	}
-
-	/*
-	for side in unit:
-	 if side has symbol:
-		szajs = symbol("active")
-		if szajs not null
-			mapa_jednsotek[szajs] = null
-	
-
-	symbol(mapa_jednostek):
-		check if symbol is active:
-
-	*/
 }
 
 
 
+bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
+	/**
+	 * Select friendly Unit on a given Cord
+	 *
+	 * @return true if unit has been selected in this operation
+	 */
+
+	AUnit* NewSelection = GridManager->GetUnit(Cord);
+	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
+	{
+		SelectedUnit = NewSelection;
+		PrintString("You have selected a Unit");
+
+		return true;
+	}
+
+	return false;
+}
 
 #pragma endregion
 
@@ -265,18 +266,9 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	FString output = Cord.ToString();
 	PrintString(output);
 
-	AUnit* NewSelection = GridManager->GetUnit(Cord);
-	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
-	{
-		SelectedUnit = NewSelection;
-		PrintString("You have selected a Unit");
+	if (SelectUnit(Cord) || SelectedUnit == nullptr)
+		return; // selected a new unit || wrong input which didn't select any ally unit
 
-		return;
-	}
-	else if (SelectedUnit == nullptr)
-	{
-		return;
-	}
 
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
