@@ -37,6 +37,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 
 	// Check if Cord is a neighbour of a SelectedUnit
 	// TODO: ? move to listener, so only tiles adj to current unit can be selected in gameplay phase
+	// maybe not - this is not generic
 	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
@@ -62,7 +63,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 3 Check for shield in IsLegalMove
 */
 
-
+// TODO: invoke Move Event!!!
 void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
 { 
 	// Move General function
@@ -100,7 +101,7 @@ bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 s
 	return true;
 }
 
-
+// TODO: subscribe to UnitMoved Event !!! and Kill Unit
 bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
@@ -123,6 +124,7 @@ bool AGameplayManager::EnemyDamage(AUnit* Target)
 	return false;
 }
 
+// TODO: subscribe to death event !!!
 void AGameplayManager::KillUnit(AUnit* Target)
 {
 	if (Target->Controller == EPlayer::DEFENDER)
@@ -133,7 +135,7 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	{
 		AttackerUnits.Remove(Target);
 	}
-	GridManager->RemoveUnit(Target);
+	// GridManager->RemoveUnit(Target); -- activated on Death Event
 
 	// TODO: Not here!  ? decorators
 	if (DefenderUnits.Num() == 0)
@@ -183,20 +185,20 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 void Bow_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
 	if (Target != nullptr && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+		Target->TakeDamage(Side);
 }
 
 // Adjacent Attack
 void Spear_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+		Target->TakeDamage(Side);
 }
 
 void Sword_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+		Target->TakeDamage(Side);
 }
 
 void Push_Action(AUnit* Unit, int32 Side) {
@@ -204,28 +206,12 @@ void Push_Action(AUnit* Unit, int32 Side) {
 	if(!Target || Target->Controller == Unit->Controller)
 		return;
 
-	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
-
-	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
-	if (BehindUnit != nullptr || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
-	{
-		KillUnit(Target);
-	}
-	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
-	{
-		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-		if (EnemyDamage(Target))  // TODO: should be passive
-			KillUnit(Target);
-	}
+	// TODO: or Target + 1? - GetAdjacentCord to Target, side
+	GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+	
 }
 
 // maybe CanDefend(attacking side) vs HasDefense(unit side)
-
-void AttackUnit(AUnit* Target, int32 AttackSide) {
-	if(!Target.CanDefend(AttackSide + 3))
-		KillUnit(Target);
-}
 
 #pragma endregion
 
