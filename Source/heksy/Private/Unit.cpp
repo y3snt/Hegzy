@@ -1,15 +1,47 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-
+#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, String)
 
 #include "Unit.h"
 
+#include "EventHandler.h"
+#include "HegzyEvents.h"
+
+
+
+void test_fun(int a) {
+	a++;
+	
+	if (GEngine) // prints stuff to screen
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+			FColor::Yellow, FString::Printf(TEXT("TEST_%d"), a), true);	
+
+}
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
+	// HANDLERS WORK!
+	// EventHandler<int> test_handler(test_fun);
+	// test_handler(1);
+
+	// EVENTS
+	//static HegzEvent<int> TestEvent;
+	
+	//TestEvent += test_fun;
+	//TestEvent(1);
+
+	// GLOBAL EVENTS
+	HegzyEvents::OnUnitMoved += test_fun;
+	HegzyEvents::OnUnitMoved(3);
+
+
+	// Global
+	//static HegzEvent<int> OnDeath;
+	//OnDeath();
+
+}
 
 
 // Sets default values

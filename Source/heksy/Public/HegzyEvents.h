@@ -16,11 +16,11 @@ class HEKSY_API HegzyEvents
 
 public:
 	//static HegzEvent<FIntPoint> OnUnitMoved;
-	//static HegzEvent<int> OnUnitMoved;
+	static inline HegzEvent<int> OnUnitMoved;
 	// static const int a = 5; // test
 
 //public:
-	//explicit HegzyEvents(const std::function<void(Args...)>& Func);
+	//explicit HegzyEvents(const std::function<void(Args...)>& Func);  -- not std::
 	//HegzyEvents();
 	//~HegzyEvents();
 };

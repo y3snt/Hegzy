@@ -22,6 +22,7 @@ public:
 			handler(params...);
 		}
 	}
+	
 	inline HegzEvent<Args...>& operator+=(const TFunction<void(Args...)>& handler)  // ew. check if same handler is not added twice... but ==
 	{
 		Add(handler);
@@ -34,10 +35,12 @@ public:
 		return *this;
 	}
 
+/*
 	inline bool operator-=(const EventHandler<Args...>& handler)
 	{
 		return RemoveHandler(handler);
 	}
+	*/
 
 protected:
 	inline void Add(const TFunction<void(Args...)>& handler)  // ? remove explicit
@@ -47,20 +50,22 @@ protected:
 
 	void AddHandler(const EventHandler<Args...>& handler)
 	{
-		Handlers.push_back(handler);
+		Handlers.Emplace(handler);
 	}
 
+/*
 	bool RemoveHandler(const EventHandler<Args...>& handler)
 	{
-		auto it = std::find(Handlers.begin(), Handlers.end(), handler);
-		if (it != Handlers.end())
+		auto it = Handlers.Find(handler);
+		if (it != INDEX_NONE)
 		{
-			Handlers.erase(it);
+			//TODO: Handlers.erase(it);
 			return true;
 		}
 
 		return false;
 	}
+	*/
 
-    std::list< EventHandler<Args...> > Handlers;
+    TArray< EventHandler<Args...> > Handlers;
 };
