@@ -15,6 +15,16 @@ public:
 	// Sets default values for this actor's properties
 	ASymbol();
 
+	//UPROPERTY(EditAnywhere, Category = "HexGrid|Effects")
+	//TArray<TSubclassOf<AEffect>> EffectList;
+
+
+	void Action();
+
+	void Block();
+
+	void Passive();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -18,11 +18,16 @@
 
 //#include "C:/Users/tomek/Documents/GitHub/CPP/Heksy   /Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperSpriteComponent.h”
 
+
+//#include "GameplayManager.h"
+
 #include "Unit.generated.h"
 
 
-class UStaticMeshComponent;
 
+class AGameplayManager;
+
+class UStaticMeshComponent;
 class UPaperSpriteComponent;
 
 UCLASS()
@@ -31,6 +36,18 @@ class HEKSY_API AUnit : public APawn
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
+	AGameplayManager* Manager;
+
+
+	bool CanAttack();
+	bool CanDefend(int32 side, ESymbols AttackerSymbol = ESymbols::SWORD);
+
+	ESymbols GetFrontSymbol();
+
+
+
+
 
 	TArray<FIntPoint> Directions = {
 			FIntPoint(1, 0),
@@ -57,6 +74,8 @@ public:
 	void Move(const FIntPoint& EndCord);
 
 	ESymbols GetSymbol(int32 side);
+
+	void TakeDamage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::SWORD);
 
 
 protected:
@@ -97,6 +116,9 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
+
+	// virtual void BeginDestroy() override;
 
 public:	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")

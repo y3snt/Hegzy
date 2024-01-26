@@ -79,11 +79,12 @@ public:
 	void Gameplay(FIntPoint Cord);
 
 	/**
-	 * Support method for MoveUnit.
+	 * Check if SelectedUnit can move to a given cord
 	 * 
 	 * @param Cord
 	 * @param ResultSide
 	 * @return True if selected Unit can move on a given Cord
+	 * @note If a Cord is adjacent, ajdacent side will be assigned in ResultSide
 	 */
 	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
@@ -110,6 +111,14 @@ public:
 
 	// Sets default values for this actor's properties
 	AGameplayManager();
+
+	AUnit* GetAdjacentEnemy(const AUnit* Unit, int32 Side);
+
+	void Bow_Action(AUnit* Unit, int32 Side);
+	void Spear_Action(AUnit* Unit, int32 Side);
+	void Sword_Action(AUnit* Unit, int32 Side);
+	void Push_Action(AUnit* Unit, int32 Side);
+	void AttackUnit(AUnit* Target, int32 AttackSide);
 
 protected:
 	// Called when the game starts or when spawned

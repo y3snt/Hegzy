@@ -2,12 +2,53 @@
 
 
 #include "Unit.h"
+#include "GameplayManager.h"
+
+
+//#include "EventHandler.h"
+
+#include "GlobalEvents.h"
+
+
+
+void test_fun(int a) {
+	a++;
+
+	if (GEngine) // prints stuff to screen
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+			FColor::Yellow, FString::Printf(TEXT("TEST_%d"), a), true);
+
+}
+
+
+
+
 
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	// HANDLERS WORK!
+	// EventHandler<int> test_handler(test_fun);
+	// test_handler(1);
+
+	// EVENTS
+	//static HegzEvent<int> TestEvent;
+
+	//TestEvent += test_fun;
+	//TestEvent(1);
+
+	// GLOBAL EVENTS
+	GlobalEvents::OnUnitMoved += test_fun;
+	GlobalEvents::OnUnitMoved(3);
+
+
+	// Global
+	//static HegzEvent<int> OnDeath;
+	//OnDeath();
 }
 
 
@@ -29,6 +70,25 @@ AUnit::AUnit()
 	CurrentRotation = 0;
 }
 
+/*
+void AUnit:BeginDestroy() {
+	Super::BeginDestroy();
+	DeathEvent(this);  // TODO !!!
+}
+
+void AUnit::TakeDamage(int32 AttackSide) {
+	/**
+	 * Take damage from AttackSide, if cannot defene - dies
+	 * 
+	 * @param AttackSide
+	 */ /*
+	if(!CanDefend(AttackSide + 3)) {
+		// KillUnit(Target);
+		this->Destroy();
+	}
+
+}
+*/
 
 
 ESymbols AUnit::GetSymbol(int32 side)
@@ -41,13 +101,74 @@ ESymbols AUnit::GetSymbol(int32 side)
 	 *
 	 * @note converts absolute hex side to loacal unit side (applying unit rotation)
 	 */
+
+
 	return Symbols[(side - CurrentRotation + 6) % 6];
 }
 
+ESymbols AUnit::GetFrontSymbol()
+{ 
+	/**
+	 * Get Symbol on a front of the Unit
+	 * 
+	 * @return ESymbols
+	 */
+	return Symbols[0];
+}
 
+bool AUnit::CanAttack()
+{
+	/**
+	 * Return true if Unit can perform an attack from the front side
+	 * 
+	 * @return true if can attack
+	 * @note returns true if action performed by the Unit can kill or move an enemy
+	 */
+	
+	// Active == can affect unit
+	TArray<ESymbols> AttackSymbols = {
+		ESymbols::SWORD,
+		ESymbols::SPEAR,
+		ESymbols::PUSH,
+		ESymbols::BOW
+	};
 
+	return AttackSymbols.Find(GetFrontSymbol()) != INDEX_NONE;
+}
 
+bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
+{
+	/**
+	 * Return true if Unit can block Symbol from given Side
+	 * 
+	 * @param Side of a Unit, from which it could perform a block
+	 * @return true if can block
+	 */
+	
+	// TODO: prority system
+	ESymbols Symbol = GetSymbol(Side);
+	if (Symbol == ESymbols::SHIELD && AttackerSymbol != ESymbols::PUSH)  // Does Unit have a shield?
+		return true;
+	
+	return false;
+}
 
+void AUnit::BeginDestroy() {
+	Super::BeginDestroy();
+	GlobalEvents::OnUnitDeath(this); 
+}
+
+void AUnit::TakeDamage(int32 AttackSide, ESymbols AttackerSymbol) {
+	/**
+	 * Take damage from AttackSide, if cannot defene - dies
+	 * 
+	 * @param AttackSide
+	 */
+	if(!CanDefend(AttackSide + 3, AttackerSymbol)) {
+		this->Destroy();
+	}
+
+}
 
 
 /*

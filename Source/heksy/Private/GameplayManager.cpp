@@ -13,7 +13,13 @@
 
 #include "GameplayManager.h"
 
+#include "GlobalEvents.h"
+
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
+
+class ASymbol;
+
+
 
 
 #pragma region Tools
@@ -28,12 +34,8 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	/**
 	 Function checks 2 things:
 	 * 1 Target Cord is a Neighbour of a SelectedUnit
-	 * 2 if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
+	 * 2 If SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
 	 *	 Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
-	 * 
-	 * @param Cord
-	 * @param ResultSide
-	 * @return True if selected Unit can move on a given Cord
 	 */
 
 	// 1
@@ -41,33 +43,25 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	if (ResultSide == INDEX_NONE)
 		return false;
 
-
 	// 2
 	AUnit* EnemyUnit = GridManager->GetUnit(Cord);
 	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
 		return true;
 
-	switch (SelectedUnit->Symbols[0])
-	{
-		case ESymbols::INVALID:
-		case ESymbols::SHIELD:
-			return false; // SelectedUnit can't deal with EnemyUnit
-		case ESymbols::PUSH:
-			return true; // SelectedUnit ignores EnemyUnit Shield
-	}
-
-	// Does EnemyUnit has a shield?
-	if (EnemyUnit->GetSymbol(ResultSide + 3) == ESymbols::SHIELD)
+	// checking if can attack from the front, cause SelectedUnit will rotate first
+	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(ResultSide + 3, SelectedUnit->GetFrontSymbol()))
 		return false;
 
 	return true;
 }
 
 
+	
+
+// TODO: invoke Move Events!!!
 void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
 { 
-	// Move General function
-	/**
+	/**  General Move function
 	 * Move this unit to EndCord
 	 *
 	 * @param EndCord Position at which unit will be placed
@@ -105,7 +99,7 @@ bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 s
 	return true;
 }
 
-
+// TODO: subscribe to UnitMoved Event !!! and Kill Unit
 bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
@@ -114,12 +108,11 @@ bool AGameplayManager::EnemyDamage(AUnit* Target)
 	{	
 		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
 		{
-
-			if (Target->GetSymbol(side) == ESymbols::SHIELD)  // Do we have a shield?
-			{
+			// TODO: ew. check if target !nullptr
+			if(Target->CanDefend(side)) 
 				continue;
-			}
 
+			// TODO: perform passive action 
 			if (Units[side]->GetSymbol(side + 3) == ESymbols::SPEAR) // Does enemy has a spear?
 			{
 				return true;
@@ -140,8 +133,9 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	{
 		AttackerUnits.Remove(Target);
 	}
-	GridManager->RemoveUnit(Target);
+	// GridManager->RemoveUnit(Target); -- activated on Death Event
 
+	// TODO: Not here!  ? decorators
 	if (DefenderUnits.Num() == 0)
 		PrintString("Attacker won");
 	else if (AttackerUnits.Num() == 0)
@@ -152,12 +146,38 @@ void AGameplayManager::KillUnit(AUnit* Target)
 
 void AGameplayManager::UnitAction(AUnit* Unit)
 {
-	TArray<AUnit* > Units = GridManager->AdjacentUnits(Unit->CurrentCord);
+	//TArray<AUnit* > Units = GridManager->AdjacentUnits(Unit->CurrentCord);
 
 	for (int32 side = 0; side < 6; side++)
 	{
-		ESymbols UnitWeapon = Unit->GetSymbol(side);
+		ESymbols UnitSymbol = Unit->GetSymbol(side);
+		
+		switch (UnitSymbol)
+		{
+			case ESymbols::BOW:
+			{
+				Bow_Action(Unit, side);
+				break;
+			}
+			
+	
+			case ESymbols::PUSH:
+			{
+				Push_Action(Unit, side);
+				break;
+			}
 
+			case ESymbols::SPEAR:// Enemy unit on the adjacent cord
+			case ESymbols::SWORD:
+			{
+				Spear_Action(Unit, side);
+				break;
+			}
+		}
+		
+
+
+		/*
 		switch (UnitWeapon)
 		{
 			case ESymbols::INVALID: 
@@ -230,11 +250,65 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 				
 			}
 		}
-
+		*/
 	}
 }
 
+AUnit* AGameplayManager::GetAdjacentEnemy(const AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GridManager->GetUnit(
+		GridManager->AdjacentCord(
+		Unit->CurrentCord, Side));
 
+	if(Target && Target->Controller != Unit->Controller)
+		return Target;
+
+	return nullptr;
+}
+
+void AGameplayManager::Bow_Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		Target->TakeDamage(Side);
+}
+
+// Adjacent Attack
+void AGameplayManager::Spear_Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GetAdjacentEnemy(Unit, Side);
+	if (Target)
+		Target->TakeDamage(Side);
+}
+
+void AGameplayManager::Sword_Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GetAdjacentEnemy(Unit, Side);
+	if (Target)
+		Target->TakeDamage(Side);
+}
+
+void AGameplayManager::Push_Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GetAdjacentEnemy(Unit, Side);
+	if (!Target)
+		return;
+
+	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, Side, 2);
+	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, Side, 2);
+
+	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
+	if (BehindUnit != nullptr || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
+	{
+		KillUnit(Target);
+	}
+	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
+	{
+		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, Side, 2));
+		if (EnemyDamage(Target))  // TODO: should be passive
+			KillUnit(Target);
+	}
+}
 
 bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
 	/**
@@ -472,6 +546,7 @@ void AGameplayManager::TimerFunction()
 
 void AGameplayManager::BeginPlay()
 {
+	//GlobalEvents::OnUnitDeath += KillUnit;
 	SetupGame();
 }
 

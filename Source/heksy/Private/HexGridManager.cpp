@@ -124,12 +124,12 @@ bool AHexGridManager::IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2)
 int32 AHexGridManager::AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2)
 {	
 	/**
-	* Return shared side between Cord1 and Cord2, if the Cords are adjacent
+	* Return shared side between Cord1 and Cord2, if Cords are adjacent
 	* 
 	* @param Cord1 
 	* @param Cord2 
-	* @return int32 Side
-	* @note INDEX_NONE is return, when Cord1 and Cord2 don't have shared side
+	* @return int32 Side number | INDEX_NONE 
+	* @note INDEX_NONE is returned, when Cord1 and Cord2 don't have shared side
 	*/
 	return Directions.Find(Cord2 - Cord1);
 }
@@ -221,20 +221,20 @@ void AHexGridManager::SpawnTiles()
 			
 			if (current_spawn == EHexTileType::SENTINEL)
 			{	
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Sentinel_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Sentinel_%d-%d"), x, y));
 			}
 			else if (current_spawn == EHexTileType::DEFAULT)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 			}
 			else if (current_spawn == EHexTileType::ATTACKER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
 				AttackerTiles.Add(newTile);
 			}
 			else if (current_spawn == EHexTileType::DEFENDER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
 				DefenderTiles.Add(newTile);
 			}
 
