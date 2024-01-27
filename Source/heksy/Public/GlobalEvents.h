@@ -4,20 +4,23 @@
 
 #include "CoreMinimal.h"
 
-
 #include "HegzEvent.h"
 #include "Unit.h"
 
+#include "UObject/NoExportTypes.h"
+#include "GlobalEvents.generated.h"
 
 /**
  * 
  */
-class HEKSY_API GlobalEvents
+UCLASS()
+class HEKSY_API UGlobalEvents : public UObject
 {
+	GENERATED_BODY()
 public:
 	static inline HegzEvent<int> OnUnitMoved;
 	static inline HegzEvent<AUnit*> OnUnitDeath;
 
-	GlobalEvents();
-	~GlobalEvents();
+	//GlobalEvents();
+	//~GlobalEvents();
 };

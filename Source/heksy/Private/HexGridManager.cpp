@@ -54,7 +54,7 @@ void AHexGridManager::RemoveUnit(AUnit* Unit)
 	UnitGrid[Cord.X][Cord.Y] = nullptr; // Remove unit from gameplay grid
 
 	//Unit->SetActorLocation(HexGrid[0][0]->GetActorLocation());
-	Unit->Destroy();
+	//Unit->Destroy();
 }
 
 #pragma region Coordinates tools

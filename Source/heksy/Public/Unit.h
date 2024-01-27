@@ -75,7 +75,8 @@ public:
 
 	ESymbols GetSymbol(int32 side);
 
-	void TakeDamage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::SWORD);
+	void TakeDamage1(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::SWORD);
+	void DestroyUnit1();
 
 
 protected:

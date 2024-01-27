@@ -3,13 +3,3 @@
 
 #include "GlobalEvents.h"
 
-
-/*
-GlobalEvents::GlobalEvents()
-{
-}
-
-GlobalEvents::~GlobalEvents()
-{
-}
-*/

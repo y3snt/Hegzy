@@ -16,7 +16,8 @@
  */
 
 template <class... Args> // variadic template - any no of args
-class HEKSY_API EventHandler // holds specific function that will be invoked, onEvent call
+//UCLASS()
+class HEKSY_API EventHandler// : public UObject // holds specific function that will be invoked, onEvent call
 {
 	//GENERATED_BODY()
 

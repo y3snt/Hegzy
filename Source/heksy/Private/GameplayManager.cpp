@@ -125,17 +125,44 @@ bool AGameplayManager::EnemyDamage(AUnit* Target)
 
 void AGameplayManager::KillUnit(AUnit* Target)
 {
+	PrintString("KILL UNIT");
+
+	if (GEngine) // prints stuff to screen
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+			FColor::Yellow, FString::Printf(TEXT("TEST_%d"), Target->CurrentRotation), true);
+
 	if (Target->Controller == EPlayer::DEFENDER)
 	{
-		DefenderUnits.Remove(Target);
+		int32 test = DefenderUnits.Find(Target);
+		if (GEngine) // prints stuff to screen
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+				FColor::Yellow, FString::Printf(TEXT("Target_%d"), test), true);
+
+		if (test == INDEX_NONE) // prints stuff to screen
+			PrintString("Ni mo");
+		else
+			AttackerUnits.RemoveAt(test);
+		//DefenderUnits.Remove(Target);
+		
 	}
 	else
 	{
-		AttackerUnits.Remove(Target);
+		int32 test = AttackerUnits.Find(Target);
+		if (GEngine) // prints stuff to screen
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+				FColor::Yellow, FString::Printf(TEXT("Attacker Target_%d"), test), true);
+
+		if (test == INDEX_NONE) // prints stuff to screen
+			PrintString("Ni mo attacker");
+		else
+			AttackerUnits.RemoveAt(test);
+		//AttackerUnits.Remove(Target);
+
 	}
-	// GridManager->RemoveUnit(Target); -- activated on Death Event
+	GridManager->RemoveUnit(Target); //  -- activated on Death Event
 
 	// TODO: Not here!  ? decorators
+	
 	if (DefenderUnits.Num() == 0)
 		PrintString("Attacker won");
 	else if (AttackerUnits.Num() == 0)
@@ -270,7 +297,7 @@ void AGameplayManager::Bow_Action(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		Target->TakeDamage(Side);
+		Target->TakeDamage1(Side);
 }
 
 // Adjacent Attack
@@ -278,14 +305,14 @@ void AGameplayManager::Spear_Action(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = GetAdjacentEnemy(Unit, Side);
 	if (Target)
-		Target->TakeDamage(Side);
+		Target->TakeDamage1(Side);
 }
 
 void AGameplayManager::Sword_Action(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = GetAdjacentEnemy(Unit, Side);
 	if (Target)
-		Target->TakeDamage(Side);
+		Target->TakeDamage1(Side);
 }
 
 void AGameplayManager::Push_Action(AUnit* Unit, int32 Side)
@@ -300,13 +327,13 @@ void AGameplayManager::Push_Action(AUnit* Unit, int32 Side)
 	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
 	if (BehindUnit != nullptr || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
 	{
-		KillUnit(Target);
+		Target->DestroyUnit1();
 	}
 	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
 	{
 		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, Side, 2));
 		if (EnemyDamage(Target))  // TODO: should be passive
-			KillUnit(Target);
+			Target->DestroyUnit1();
 	}
 }
 
@@ -523,13 +550,14 @@ void AGameplayManager::SpawnUnits()
 
 void AGameplayManager::SetupGame()
 {
+	PrintString("elo");
 	GridManager->GenerateGrid();
 	SpawnUnits();
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
 	
 	
-	//SimpleAutomaticTests();
+	SimpleAutomaticTests();
 }
 
 /*
@@ -544,10 +572,44 @@ void AGameplayManager::TimerFunction()
 }
 */
 
+void AGameplayManager::test_fun(AUnit* unit)
+{
+	PrintString("siema");
+}
+
+void AGameplayManager::test_fun2(AUnit* unit)
+{
+	PrintString("siema2");
+}
+
 void AGameplayManager::BeginPlay()
 {
-	//GlobalEvents::OnUnitDeath += KillUnit;
+	// TODO: move this wrapper to HegzEvent
+	
+	TFunction<void(AUnit*)> KillUnitBind = [this](AUnit* Unit)
+	{
+		KillUnit(Unit);
+	};
+	UGlobalEvents::OnUnitDeath += KillUnitBind;
+
+	/*
+	TFunction<void(AUnit*)> test_fun_Bind = [this](AUnit* Unit)
+	{
+		test_fun(Unit);
+	};
+	*/
+	//UGlobalEvents::OnUnitDeath += test_fun_Bind;
+
+	/*
+	TFunction<void(AUnit*)> test_fun2_Bind = [this](AUnit* Unit)
+	{
+		test_fun2(Unit);
+	};
+	*/
+	//UGlobalEvents::OnUnitDeath += test_fun2_Bind;
+	//UGlobalEvents::OnUnitDeath(nullptr);
 	SetupGame();
+	
 }
 
 

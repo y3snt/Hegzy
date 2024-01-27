@@ -120,6 +120,9 @@ public:
 	void Push_Action(AUnit* Unit, int32 Side);
 	void AttackUnit(AUnit* Target, int32 AttackSide);
 
+	void test_fun(AUnit* unit);
+	void test_fun2(AUnit* unit);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;   // __ why virtual and override??

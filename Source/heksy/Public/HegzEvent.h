@@ -10,7 +10,8 @@
  *
  */
 template<class... Args>
-class HEKSY_API HegzEvent
+//UCLASS()
+class HEKSY_API HegzEvent// : public UObject
 {
 	//GENERATED_BODY()
 

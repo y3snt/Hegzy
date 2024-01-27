@@ -11,13 +11,13 @@
 
 
 
-void test_fun(int a) {
+void test_fun(int a)
+{
 	a++;
 
 	if (GEngine) // prints stuff to screen
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
 			FColor::Yellow, FString::Printf(TEXT("TEST_%d"), a), true);
-
 }
 
 
@@ -42,8 +42,8 @@ void AUnit::BeginPlay()
 	//TestEvent(1);
 
 	// GLOBAL EVENTS
-	GlobalEvents::OnUnitMoved += test_fun;
-	GlobalEvents::OnUnitMoved(3);
+	//GlobalEvents::OnUnitMoved += test_fun;
+	//GlobalEvents::OnUnitMoved(3);
 
 
 	// Global
@@ -153,21 +153,34 @@ bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
 	return false;
 }
 
-void AUnit::BeginDestroy() {
-	Super::BeginDestroy();
-	GlobalEvents::OnUnitDeath(this); 
+void AUnit::BeginDestroy()
+{
+	Super::BeginDestroy(); 
 }
 
-void AUnit::TakeDamage(int32 AttackSide, ESymbols AttackerSymbol) {
+void AUnit::TakeDamage1(int32 AttackSide, ESymbols AttackerSymbol)
+{
 	/**
 	 * Take damage from AttackSide, if cannot defene - dies
 	 * 
 	 * @param AttackSide
 	 */
 	if(!CanDefend(AttackSide + 3, AttackerSymbol)) {
+		UGlobalEvents::OnUnitDeath(this);
 		this->Destroy();
 	}
+}
 
+void AUnit::DestroyUnit1()
+{
+	/**
+	 * Take damage from AttackSide, if cannot defene - dies
+	 * 
+	 * @param AttackSide
+	 */
+	
+	UGlobalEvents::OnUnitDeath(this);
+	this->Destroy();
 }
 
 
