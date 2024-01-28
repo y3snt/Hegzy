@@ -127,24 +127,6 @@ bool AUnit::CanDefend(int32 Side)
 	return false;
 }
 
-void AUnit:BeginDestroy() {
-	Super::BeginDestroy();
-	DeathEvent(this);  // TODO !!!
-}
-
-void AUnit::TakeDamage(int32 AttackSide) {
-	/**
-	 * Take damage from AttackSide, if cannot defene - dies
-	 * 
-	 * @param AttackSide
-	 */
-	if(!CanDefend(AttackSide + 3)) {
-		// KillUnit(Target);
-		this->Destroy();
-	}
-
-}
-
 /**
  * Move this unit to EndCord
  * 

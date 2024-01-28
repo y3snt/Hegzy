@@ -26,24 +26,12 @@ AUnit* AHexGridManager::GetUnit(const FIntPoint& Cord)
 
 void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint& Cord)
 {
-	// ValidatePostiotn
-	EHexTileType MoveTile = GetTileType(Cord);  // tile on which we want to move Unit
-	AUnit* CurrentUnit = GetUnit(Cord); // check if there is Unit currently on that tile 
-	
-	if (CurrentUnit != nullptr || MoveTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
-	{
-		Unit->Destroy();
-		return;
-	}
-	
 	UnitGrid[Unit->CurrentCord.X][Unit->CurrentCord.Y] = nullptr; // clean your previous location
 	UnitGrid[Cord.X][Cord.Y] = Unit; // UnitGrid Update
 
 	Unit->CurrentCord = Cord; // update Unit Index
 	
 	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
-
-	UnitMovedEvent(Unit); // TODO: invokes EnemyDamage on a Unit
 }
 
 void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
@@ -59,13 +47,14 @@ void AHexGridManager::RotateUnit(AUnit* Unit, int32 Direction)
 }
 
 
-// TODO: subscribe to death event !!!
+
 void AHexGridManager::RemoveUnit(AUnit* Unit)
 {
 	FIntPoint Cord = Unit->CurrentCord;
 	UnitGrid[Cord.X][Cord.Y] = nullptr; // Remove unit from gameplay grid
 
 	//Unit->SetActorLocation(HexGrid[0][0]->GetActorLocation());
+	Unit->Destroy();
 }
 
 #pragma region Coordinates tools
