@@ -4,9 +4,15 @@
 
 #include "ReadWriteFile.h"
 
+#include "GameplayHandler.h"
+
+#include "Engine/World.h"
+#include <Kismet/GameplayStatics.h>
+
 
 #include "HAL/PlatformFileManager.h"	// Core
 #include "Misc/FileHelper.h"	// Core
+
 
 
 FString UReadWriteFile::ReadStringFromFile(FString FilePath, bool& bOutSuccess, FString& OutInfoMessage)
@@ -55,10 +61,9 @@ void UReadWriteFile::WriteStringToFile(FString FilePath, FString String, bool& b
 
 
 
-void UReadWriteFile::InputConnectListener(FIntPoint Cord, AGameplayManager *Manager, bool& bOutSuccess, FString& OutInfoMessage)
+void UReadWriteFile::InputConnectListener(FIntPoint Cord, UGameplayHandler* Handler, bool& bOutSuccess, FString& OutInfoMessage)
 {
-    
-    Manager->InputListener(Cord);
+    Handler->helloworld();
     
     bOutSuccess = true;
     OutInfoMessage = FString::Printf(TEXT("Pass Cord To Gameplay Manager Succeeded"));

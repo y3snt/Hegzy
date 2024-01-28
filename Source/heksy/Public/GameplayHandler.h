@@ -1,28 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-// Basic Includes
+
+// Unreal Includes
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Subsystems/GameInstanceSubsystem.h"
+
+// Gameplay
+#include "GameplayEnums.h"
+
+#include "HexGridManager.h"
+#include "GridManager.h"
+#include "Unit.h"
 
 // Trick
 #include "LevelUtils.h"
 #include "Kismet/KismetMathLibrary.h"  // Max3 Function
 
-// Gameplay Actor
-#include "HexGridManager.h"
-#include "Unit.h"
 
-#include "GameplayEnums.h"
-
-
-
-#include "GameplayManager.generated.h"
+#include "GameplayHandler.generated.h"
 
 /**
  * 
  */
-
 
 UENUM()
 enum class EAutomaticTestsList : uint8  // __ why uint?
@@ -35,9 +35,22 @@ enum class EAutomaticTestsList : uint8  // __ why uint?
 
 
 UCLASS()
-class HEKSY_API AGameplayManager : public AActor
+class HEKSY_API UGameplayHandler : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
+	
+
+public:
+	void helloworld();
+
+	//UGameplayHandler();
+
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    virtual void Deinitialize() override;
+
+
+
+
 
 protected:
 	void SpawnUnits();
@@ -49,7 +62,7 @@ protected:
 	AUnit* SelectedUnit;
 
 
-	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")   // __ ? we can change the value of a blueprint later
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AutomaticTests|Basic")   // __ ? we can change the value of a blueprint later
 	EAutomaticTestsList AutomaticTest;
 
 	void SimpleAutomaticTests();
@@ -57,16 +70,20 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	AHexGridManager *GridManager;  // TODO: singleton, SMART POINTERS!!!
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GameplayProperties|Map")
+	UGridManager* GridManager; 
 
 
+
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
+	TArray<TSubclassOf<AUnit>> AttackerUnitsTypes;
+
+	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
+	TArray<TSubclassOf<AUnit>> DefenderUnitTypes;
+
+
 	TArray<AUnit*> AttackerUnits;
-	
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> DefenderUnits;
-
+	TArray<AUnit*> DefenderUnit;
 
 	void InputListener(FIntPoint Cord);
 
@@ -92,6 +109,17 @@ public:
 	void MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side);
 
 	void UnitAction(AUnit* Unit);
+
+
+	void AttackUnit(AUnit* Target, int32 AttackSide);
+
+	void Bow_Action(AUnit* Unit, int32 Side);
+
+	void Spear_Action(AUnit* Unit, int32 Side);
+
+	void Sword_Action(AUnit* Unit, int32 Side);
+
+	void Push_Action(AUnit* Unit, int32 Side);
 	/*
 	void TimerFunction();
 	FTimerHandle TimerHandle;
@@ -99,11 +127,7 @@ public:
 	*/
 
 
-	// Sets default values for this actor's properties
-	AGameplayManager();
-
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;   // __ why virtual and override??
-
+	//virtual void BeginPlay() override;   // __ why virtual and override??
 };

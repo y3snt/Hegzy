@@ -2,12 +2,18 @@
 
 
 #include "Unit.h"
+#include "GameplayHandler.h"
 
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GameInstance = GetWorld()->GetGameInstance<UGameInstance>();
+
+	if (GameInstance)
+		Gameplay = GameInstance->GetSubsystem<UGameplayHandler>();
 }
 
 
@@ -15,6 +21,7 @@ void AUnit::BeginPlay()
 // Sets default values
 AUnit::AUnit()
 {
+
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));  // "container" for other components
 	UnitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh"));  // TODO: shared_ptr/unique; this is mesh for the tile
 	UnitMesh->SetupAttachment(RootComponent);  // attach component to the root / container
@@ -78,7 +85,8 @@ ESymbols AUnit::GetFrontSymbol() {
 	return Symbols[0];
 }
 
-ESymbols AUnit::GetSymbol(int32 side) { 
+ESymbols AUnit::GetSymbol(int32 side)
+{ 
 	/**
 	 * Get the Symbol on a given side of Unit
 	 * 
@@ -100,7 +108,7 @@ bool AUnit::CanAttack()
 	 */
 	
 	// Active == can affect unit
-	TArray<FIntPoint> AttackSymbols = {
+	TArray<ESymbols> AttackSymbols = {
 		ESymbols::SWORD,
 		ESymbols::SPEAR,
 		ESymbols::PUSH,
@@ -111,7 +119,7 @@ bool AUnit::CanAttack()
 }
 
 
-bool AUnit::CanDefend(int32 Side)
+bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol) // ==
 {
 	/**
 	 * Return true if Unit can block action from given Side
@@ -121,10 +129,19 @@ bool AUnit::CanDefend(int32 Side)
 	 */
 	
 	ESymbols Symbol = GetSymbol(Side);
-	if (Symbol == ESymbols::SHIELD)  // Does Unit have a shield?
+	if (Symbol == ESymbols::SHIELD && AttackerSymbol != ESymbols::PUSH)  // Does Unit have a shield?
 		return true;
 	
 	return false;
+}
+
+void AUnit::Damage(int32 AttackSide)
+{
+	if (!CanDefend(AttackSide + 3))
+	{
+		//Gameplay->KillUnit(this);
+		Gameplay->helloworld();
+	}	
 }
 
 /**

@@ -147,20 +147,19 @@ FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, int32 Side)
 	return BaseCord + Directions[Side];
 }
 
-static int32 AHexGridManager::AdjacentCordSide(int32 Side)
+int32 AHexGridManager::AdjacentCordSide(int32 Side) // static 
 {
 	/**
-	 * Convert side of a cord to its corresponding adjacent cord side
-	 * ex. 2 -> 5   //  (current cord side) -> (adjacent cord side)
-	 * ___               
-	 *    \___          
-	 * __2/5  \     
-	 *    \___/     
-	 *     
-	 * @param Side side number of current cord
-	 * @return side number of a cord, which shares a side with a current cord
-	 */
-
+ * Convert side of a cord to its corresponding adjacent cord side
+ * ex. 2 -> 5   //  (current cord side) -> (adjacent cord side)
+ * ___
+ *    \___
+ * __2/5  \
+ *    \___/
+ *
+ * @param Side side number of current cord
+ * @return side number of a cord, which shares a side with a current cord
+ */
 	return Side + 3;
 }
 

@@ -11,6 +11,7 @@
 
 #include "Symbol.h"
 
+
 //#include "HegzyEvents.h"
 
 //#include "HegzEvent.cpp" //aa
@@ -20,6 +21,8 @@
 
 #include "Unit.generated.h"
 
+
+class UGameplayHandler;
 
 class UStaticMeshComponent;
 
@@ -97,8 +100,14 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+
 
 public:	
+	UGameInstance* GameInstance;
+	UGameplayHandler* Gameplay;
+
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	TArray<ESymbols> Symbols;
 
@@ -140,9 +149,13 @@ public:
 
 	ESymbols GetSymbol(int32 side);
 	
-
+	bool CanAttack();
+	bool CanDefend(int32 Side, ESymbols AttackerSymbol = ESymbols::INVALID);
+	ESymbols GetFrontSymbol();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void Damage(int32 AttackSide);
+	
 
 };
