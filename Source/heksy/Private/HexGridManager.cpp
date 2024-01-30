@@ -2,6 +2,8 @@
 
 #include "HexGridManager.h"
 
+//#define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
+
 
 const TArray<FIntPoint> AHexGridManager::Directions = {
 	FIntPoint(1, 0),
@@ -315,9 +317,32 @@ void AHexGridManager::GenerateGrid()
 
 }
 
+#include "EngineUtils.h"
+#include "Engine.h"
+
+int32 AHexGridManager::s_test_val = 0;
+
 void AHexGridManager::BeginPlay()
-{
+{	/*
+	for (TActorIterator<AUnit> It(GetWorld()); It; ++It)
+	{
+		if (AUnit* Unit = Cast<AUnit>(*It))
+		{
+			PrintString("oke");
+		}
+	} */
 	//GenerateGrid();
+
+	//const c_test_val = test_val;
+	s_test_val = test_val;
+
+
+	if (GEngine) // prints stuff to screen
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+			FColor::Yellow, FString::Printf(TEXT("GridWidth equals %d"),
+				s_test_val), true);
+
+	//PrintString(s_test_val);
 }
 
 // Sets default values

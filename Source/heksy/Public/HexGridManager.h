@@ -143,4 +143,10 @@ public:
 
 	// Sets default values for this actor's properties
 	AHexGridManager();
+
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
+	int32 test_val;
+
+	static int32 s_test_val;
+
 };
