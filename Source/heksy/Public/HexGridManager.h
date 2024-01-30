@@ -149,4 +149,10 @@ public:
 
 	static int32 s_test_val;
 
+	//UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
+	//int *ptr_test_val;
+
+	//static int *s_ptr_test_val;
+
+
 };

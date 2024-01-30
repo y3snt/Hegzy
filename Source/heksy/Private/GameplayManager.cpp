@@ -447,9 +447,12 @@ void AGameplayManager::SpawnUnits()
 }
 
 
+AHexGridManager *AGameplayManager::s_GridMG_ptr = nullptr;
+
 void AGameplayManager::SetupGame()
 {
-	GridManager->GenerateGrid();
+	s_GridMG_ptr->GenerateGrid();
+	//GridManager->GenerateGrid();
 	SpawnUnits();
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
@@ -472,6 +475,7 @@ void AGameplayManager::TimerFunction()
 
 void AGameplayManager::BeginPlay()
 {
+	s_GridMG_ptr = GridManager;
 	SetupGame();
 }
 

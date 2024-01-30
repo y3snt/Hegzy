@@ -321,6 +321,7 @@ void AHexGridManager::GenerateGrid()
 #include "Engine.h"
 
 int32 AHexGridManager::s_test_val = 0;
+//int32 *AHexGridManager::s_ptr_test_val = nullptr;
 
 void AHexGridManager::BeginPlay()
 {	/*
@@ -335,6 +336,7 @@ void AHexGridManager::BeginPlay()
 
 	//const c_test_val = test_val;
 	s_test_val = test_val;
+	//s_ptr_test_val = ptr_test_val;
 
 
 	if (GEngine) // prints stuff to screen

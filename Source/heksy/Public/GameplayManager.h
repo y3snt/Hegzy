@@ -59,6 +59,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
 	AHexGridManager *GridManager;  // TODO: singleton, SMART POINTERS!!!
 
+	static AHexGridManager *s_GridMG_ptr;
+
 
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
 	TArray<AUnit*> AttackerUnits;
