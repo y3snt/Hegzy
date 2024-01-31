@@ -81,7 +81,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 		return;
 	}
 
-	UnitAction(SelectedUnit);
+	SelectedUnit->Action();
 
 	GridManager->ChangeUnitPosition(Unit, EndCord);
 
@@ -91,15 +91,9 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 		return;
 	}
 		
-	UnitAction(SelectedUnit);
+	SelectedUnit->Action();
 
 }
-
-bool AGameplayManager::SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 side)
-{
-	return true;
-}
-
 
 bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
@@ -144,88 +138,7 @@ void AGameplayManager::KillUnit(AUnit* Target)
 }
 
 
-void AGameplayManager::UnitAction(AUnit* Unit)
-{
-	TArray<AUnit* > Units = GridManager->AdjacentUnits(Unit->CurrentCord);
-
-	for (int32 side = 0; side < 6; side++)
-	{
-		ESymbols UnitSymbol = Unit->GetSymbol(side);
-
-		if (UnitSymbol == ESymbols::BOW)
-		{
-			Bow_Action(Unit, side);
-		}
-		else if (UnitSymbol == ESymbols::PUSH) 
-		{
-			Push_Action(Unit, Side);
-		}
-		else if (UnitSymbol == ESymbols::SPEAR || UnitSymbol == ESymbols::SWORD)  // Enemy unit on the adjacent cord
-		{
-			Spear_Action(Unit, Side);
-		}
-	}
-
-	/*
-	for side in unit:
-	 if side has symbol:
-		szajs = symbol("active")
-		if szajs not null
-			mapa_jednsotek[szajs] = null
-	
-
-	symbol(mapa_jednostek):
-		check if symbol is active:
-
-	*/
-}
-
-void Bow_Action(AUnit* Unit, int32 Side) {
-	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
-	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
-}
-
-// Adjacent Attack
-void Spear_Action(AUnit* Unit, int32 Side) {
-	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
-	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
-}
-
-void Sword_Action(AUnit* Unit, int32 Side) {
-	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
-	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
-}
-
-void Push_Action(AUnit* Unit, int32 Side) {
-	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
-	if(!Target || Target->Controller == Unit->Controller)
-		return;
-
-	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
-
-	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
-	if (BehindUnit != nullptr || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
-	{
-		KillUnit(Target);
-	}
-	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
-	{
-		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
-		if (EnemyDamage(Target))  // TODO: should be passive
-			KillUnit(Target);
-	}
-}
-
 // maybe CanDefend(attacking side) vs HasDefense(unit side)
-
-void AttackUnit(AUnit* Target, int32 AttackSide) {
-	if(!Target.CanDefend(AttackSide + 3))
-		KillUnit(Target);
-}
 
 #pragma endregion
 

@@ -146,6 +146,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	bool CanDefend(int32 Side, ESymbols AttackerSymbol = ESymbols::INVALID);
-	void Damage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::INVALID); 
+	void Damage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::INVALID);
+	void Action();
 
 };

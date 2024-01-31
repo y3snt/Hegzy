@@ -81,8 +81,6 @@ public:
 
 	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
-	bool SymbolAttack(AUnit* Attack, AUnit* Defense, const int32 side);
-
 	void KillUnit(AUnit* Target);
 
 
@@ -90,8 +88,6 @@ public:
 	bool EnemyDamage(AUnit* Target);
 
 	void MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side);
-
-	void UnitAction(AUnit* Unit);
 	/*
 	void TimerFunction();
 	FTimerHandle TimerHandle;

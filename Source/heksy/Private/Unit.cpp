@@ -140,6 +140,18 @@ void AUnit::Damage(int32 AttackSide, ESymbols AttackerSymbol)
 
 }
 
+void AUnit::Action()
+{
+	for (int32 side = 0; side < 6; side++)
+	{
+		ESymbols Symbol = GetSymbol(side);
+
+		if(Cast<IAction>(Symbol))
+			UnitSymbol.Action(this, side);
+
+	}
+}
+
 /**
  * Move this unit to EndCord
  * 
