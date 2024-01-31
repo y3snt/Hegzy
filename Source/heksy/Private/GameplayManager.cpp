@@ -97,6 +97,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 
 bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
+	// TODO: return true if Unit was killed; update in symbols (and in other classes)
 	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
 
 	for (int32 side = 0; side < 6; side++) 

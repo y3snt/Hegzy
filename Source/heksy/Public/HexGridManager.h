@@ -22,21 +22,11 @@ class HEKSY_API AHexGridManager : public AActor
 {
 	GENERATED_BODY()
 
-private:
-	
-	void BlueprintsCheck();  // stops the program if the properties aren't setup
-	void InitHexGridArray();
-	void SpawnTiles();
-
-	void AdjustGridSize();
-	bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
-	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
-
+protected:
 	EHexTileType current_spawn;  // ??
 	const static TArray<FIntPoint> Directions;
+	TArray<TArray<AHexTile*>> HexGrid;  // pointers to hex objects / tiles
 
-
-protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")   // __ ? we can change the value of a blueprint later
 	int32 GridWidth;   // no tiles horizonally
 
@@ -66,16 +56,24 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
 	TSubclassOf<AHexTile> SentinelHexTile;
 
-	
-	TArray<TArray<AHexTile*>> HexGrid;  // pointers to hex objects / tiles
 
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;   // __ why virtual and override??
+	virtual void BeginPlay() override;   
+	
+	void BlueprintsCheck();  // stops the program if the properties aren't setup
+	void InitHexGridArray();
+	void SpawnTiles();
+
+	void AdjustGridSize();
+	bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
+	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 public:
-	TArray<AHexTile*> DefenderTiles;
+	TArray<AHexTile*> DefenderTiles;  // TODO: move to protected
 	TArray<AHexTile*> AttackerTiles;
 	TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
+
+	AHexGridManager();
 
 	EHexTileType GetTileType(const FIntPoint& Cord) const;
 	AUnit* GetUnit(const FIntPoint& Cord);
@@ -141,7 +139,4 @@ public:
 	void RemoveUnit(AUnit* Unit);
 
 	void GenerateGrid();
-
-	// Sets default values for this actor's properties
-	AHexGridManager();
 };
