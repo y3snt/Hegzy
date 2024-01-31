@@ -127,6 +127,19 @@ bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
 	return false;
 }
 
+void AUnit::Damage(int32 AttackSide, ESymbols AttackerSymbol) 
+{
+	/**
+	 * Take damage from AttackSide, if cannot defend - dies
+	 * 
+	 * @param AttackSide
+	 */
+	if(!CanDefend(AttackSide + 3, AttackerSymbol)) {
+		AGameplayManager::KillUnit(this);
+	}
+
+}
+
 /**
  * Move this unit to EndCord
  * 

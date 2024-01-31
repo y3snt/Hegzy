@@ -49,7 +49,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	// checking if can attack from the front, cause SelectedUnit will rotate first
 	
 	int32 EnemySide = GridManager.AdjacentCordSide(ResultSide);
-	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide))
+	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide, SelectedUnit->GetSymbol(ResultSide)))
 		return false;
 
 	return true;
@@ -182,21 +182,21 @@ void AGameplayManager::UnitAction(AUnit* Unit)
 
 void Bow_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
-	if (Target != nullptr && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
 }
 
 // Adjacent Attack
 void Spear_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+		Target->Damage(Side);
 }
 
 void Sword_Action(AUnit* Unit, int32 Side) {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		AttackUnit(Target, Side);
+		Target->Damage(Side);
 }
 
 void Push_Action(AUnit* Unit, int32 Side) {
