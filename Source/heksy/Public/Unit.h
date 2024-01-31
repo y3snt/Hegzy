@@ -145,4 +145,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool CanDefend(int32 Side, ESymbols AttackerSymbol = ESymbols::INVALID);
+
 };

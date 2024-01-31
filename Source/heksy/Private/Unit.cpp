@@ -100,7 +100,7 @@ bool AUnit::CanAttack()
 	 */
 	
 	// Active == can affect unit
-	TArray<FIntPoint> AttackSymbols = {
+	TArray<ESymbols> AttackSymbols = {
 		ESymbols::SWORD,
 		ESymbols::SPEAR,
 		ESymbols::PUSH,
@@ -111,7 +111,7 @@ bool AUnit::CanAttack()
 }
 
 
-bool AUnit::CanDefend(int32 Side)
+bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
 {
 	/**
 	 * Return true if Unit can block action from given Side
@@ -121,7 +121,7 @@ bool AUnit::CanDefend(int32 Side)
 	 */
 	
 	ESymbols Symbol = GetSymbol(Side);
-	if (Symbol == ESymbols::SHIELD)  // Does Unit have a shield?
+	if (Symbol == ESymbols::SHIELD && AttackerSymbol != ESymbols::PUSH)  // Does Unit have a shield?
 		return true;
 	
 	return false;
