@@ -38,6 +38,23 @@ public:
     virtual void Action(AUnit* Unit, int32 Side);  // == 0 ?
 };
 
+// Action.h
+#include "Action.generated.h"
+
+UINTERFACE(MinimalAPI, Blueprintable)
+class UPassiveAction : public UInterface
+{
+    GENERATED_BODY()
+};
+
+class IPassiveAction
+{    
+    GENERATED_BODY()
+
+public:
+    virtual void PassiveAction(AUnit* Unit, int32 Side);  // == 0 ?
+};
+
 // Sword.h
 UCLASS(Blueprintable, Category="MyGame")
 class ASword : public AActor, public IAction
@@ -59,17 +76,25 @@ void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 
 // Spear.h
 UCLASS(Blueprintable, Category="MyGame")
-class ASpear : public AActor, public IAction
+class ASpear : public AActor, public IAction, public IPassiveAction
 {
     GENERATED_BODY()
 
 public:
     /** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
+	virtual void PassiveAction(AUnit* Unit, int32 Side) override;
 }
 
 // Spear.cpp
 void ASpear::Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+
+void ASpear::PassiveAction(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)

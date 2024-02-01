@@ -152,6 +152,14 @@ void AUnit::Action()
 	}
 }
 
+void AUnit::PassiveAction(int32 Side)
+{
+	ESymbols Symbol = GetSymbol(Side);
+
+	if(Cast<IPassiveAction>(Symbol))
+		UnitSymbol.PassiveAction(this, Side);
+}
+
 /**
  * Move this unit to EndCord
  * 

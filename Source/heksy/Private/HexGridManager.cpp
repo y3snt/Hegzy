@@ -335,7 +335,7 @@ void AHexGridManager::GenerateGrid()
 }
 
 void AHexGridManager::PostInitializeComponents()
-{ // PrintString
+{ // PrintString, maybe in constructor?
 	GridWidth = UGridWidth;
 	GridHeight = UGridHeight;
 	OddRowHorizontalOffset = UOddRowHorizontalOffset;

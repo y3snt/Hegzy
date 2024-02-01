@@ -148,5 +148,6 @@ public:
 	bool CanDefend(int32 Side, ESymbols AttackerSymbol = ESymbols::INVALID);
 	void Damage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::INVALID);
 	void Action();
+	void PassiveAction(int32 Side);
 
 };

@@ -63,7 +63,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 */
 
 
-void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side)
+void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 side)
 { 
 	// Move General function
 	/**
@@ -72,54 +72,45 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 	 * @param EndCord Position at which unit will be placed
 	 */
 
-	Unit->Rotate(side); // 1
+	SelectedUnit->Rotate(side); // 1
 
-	//TODO: if shields: // maybe check for every unit
-	if (EnemyDamage(Unit))
-	{
-		KillUnit(Unit);
-		return;
-	}
+	EnemyDamage();
+	if(SelectUnit == nullptr) return;  // unit wass killed
 
 	SelectedUnit->Action();
 
-	AHexGridManager::ChangeUnitPosition(Unit, EndCord);
+	AHexGridManager::ChangeUnitPosition(SelectedUnit, EndCord);
 
-	if (EnemyDamage(Unit))
-	{//spr czy nie giniemy HegzyEvents.OnUnitMoved(CurrentCord);
-		KillUnit(Unit);
-		return;
-	}
-		
+	EnemyDamage();
+	if(SelectUnit == nullptr) return;  // unit wass killed
+
 	SelectedUnit->Action();
 
 }
 
-bool AGameplayManager::EnemyDamage(AUnit* Target)
+void AGameplayManager::EnemyDamage()
 { // Returns true is Enemy spear can kill the Target
 	// TODO: return true if Unit was killed; update in symbols (and in other classes)
-	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(Target->CurrentCord);
+	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(SelectedUnit->CurrentCord);
 
 	for (int32 side = 0; side < 6; side++) 
 	{	
-		if (Units[side] != nullptr && Units[side]->Controller != Target->Controller)
+		if (SelectUnit == nullptr) break;
+		
+		if (Units[side] && Units[side]->Controller != SelectedUnit->Controller)
 		{	
-			// TODO: ew. check if target !nullptr
-			if(Target->CanDefend(side)) 
-				continue;
-			
-			// TODO: perform passive action 
-			ESymbols EnemySymbol = Units[side]->GetSymbol(side + 3);  // TODO: ew. check if !nullptr
-			if (EnemySymbol == ESymbols::SPEAR)  // Does enemy have a spear?
-				return true;
+			int32 EnemySide = side + 3;
+			Units[side]->PassiveAction(EnemySide)
 
 		}
 	}
-	return false;
 }
 
 void AGameplayManager::KillUnit(AUnit* Target)
 {
+	if (Target == SelectedUnit)
+		SelectedUnit = nullptr;
+
 	if (Target->Controller == EPlayer::DEFENDER)
 	{
 		DefenderUnits.Remove(Target);
@@ -130,12 +121,15 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	}
 	AHexGridManager::RemoveUnit(Target);
 
-	// TODO: Not here!  ? decorators
+	CheckWin();
+	
+}
+
+void AGameplayManager::CheckWin() {
 	if (DefenderUnits.Num() == 0)
 		PrintString("Attacker won");
 	else if (AttackerUnits.Num() == 0)
 		PrintString("Defender won");
-	
 }
 
 
@@ -181,7 +175,7 @@ bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
 	 */
 
 	AUnit* NewSelection = AHexGridManager::GetUnit(Cord);
-	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
+	if (NewSelection && NewSelection->Controller == CurrentPlayer)
 	{
 		SelectedUnit = NewSelection;
 		PrintString("You have selected a Unit");
@@ -212,7 +206,7 @@ void AGameplayManager::Gameplay(FIntPoint Cord)
 		// 5 Check for Spear
 
 		// 6 Actions
-		MoveUnit(SelectedUnit, Cord, side);
+		MoveUnit(Cord, side);
 		//PrintString(FString::Printf(TEXT("DIRECTION_%d"), side));
 		//testKillUnit(Cord);
 		

@@ -52,6 +52,8 @@ protected:
 
 	bool SelectUnit(const FIntPoint& Cord);
 
+	void CheckWin();
+
 public:
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
 	TArray<AUnit*> AttackerUnits;
