@@ -37,7 +37,7 @@ class HEKSY_API AGameplayManager : public AActor
 protected:
 	int32 UnitsLeftToBeSummoned;
 	EPlayer CurrentPlayer = EPlayer::ATTACKER;
-	AUnit* SelectedUnit;
+	static AUnit* SelectedUnit;
 
 	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")
 	EAutomaticTestsList AutomaticTest;
@@ -45,6 +45,7 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override; 
 
 	void SpawnUnits();
 
@@ -54,13 +55,14 @@ protected:
 
 	void CheckWin();
 
-public:
+public:  // TODO: why all of those are public
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> AttackerUnits;
+	TArray<AUnit*> UAttackerUnits;
+	static TArray<AUnit*> AttackerUnits;
 	
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> DefenderUnits;
-
+	TArray<AUnit*> UDefenderUnits;
+	static TArray<AUnit*> DefenderUnits;
 
 	AGameplayManager();
 
@@ -76,7 +78,7 @@ public:
 
 	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
-	void KillUnit(AUnit* Target);
+	static void KillUnit(AUnit* Target);
 	
 	bool EnemyDamage(AUnit* Target);
 

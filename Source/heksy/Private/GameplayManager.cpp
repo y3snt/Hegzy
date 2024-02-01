@@ -16,6 +16,11 @@
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
 
+AUnit* AGameplayManager::SelectedUnit = nullptr;
+TArray<AUnit*> AGameplayManager::AttackerUnits;
+TArray<AUnit*> AGameplayManager::DefenderUnits;
+
+
 #pragma region Tools
 
 void AGameplayManager::SwitchPlayerTurn()
@@ -96,7 +101,7 @@ void AGameplayManager::EnemyDamage()
 	for (int32 side = 0; side < 6; side++) 
 	{	
 		if (SelectUnit == nullptr) break;
-		
+
 		if (Units[side] && Units[side]->Controller != SelectedUnit->Controller)
 		{	
 			int32 EnemySide = side + 3;
@@ -364,6 +369,12 @@ void AGameplayManager::TimerFunction()
 	}
 }
 */
+
+void AGameplayManager::PostInitializeComponents() {
+	AttackerUnits = UAttackerUnits;
+	DefenderUnits = UDefenderUnits;
+}
+
 
 void AGameplayManager::BeginPlay()
 {
