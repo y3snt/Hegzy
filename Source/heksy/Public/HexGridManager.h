@@ -22,68 +22,78 @@ class HEKSY_API AHexGridManager : public AActor
 {
 	GENERATED_BODY()
 
-protected:
-	EHexTileType current_spawn;  // ??
+private:
+	static EHexTileType current_spawn;  // ??
 	const static TArray<FIntPoint> Directions;
-	TArray<TArray<AHexTile*>> HexGrid;  // pointers to hex objects / tiles
+	static TArray<TArray<AHexTile*>> HexGrid;  // pointers to hex objects / tiles
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")   // __ ? we can change the value of a blueprint later
-	int32 GridWidth;   // no tiles horizonally
+	int32 UGridWidth;   // no tiles horizonally
+	static int32 GridWidth;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
-	int32 GridHeight;  // no tiles horizonally vertically
+	int32 UGridHeight;  // no tiles horizonally vertically
+	static int32 GridHeight;
 
-	int32 BorderSize;
-
-	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
-	float OddRowHorizontalOffset;
+	static int32 BorderSize;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
-	float TileHorizontalOffset;
+	float UOddRowHorizontalOffset; // TODO: should this be Uproperty
+	static float OddRowHorizontalOffset;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
-	float TileVerticalOffset;
+	float UTileHorizontalOffset; 
+	static float TileHorizontalOffset;
+
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
+	float UTileVerticalOffset;
+	static float TileVerticalOffset;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> AttackerHexTile;
+	TSubclassOf<AHexTile> UAttackerHexTile;
+	static TSubclassOf<AHexTile> AttackerHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> DefenderHexTile;
+	TSubclassOf<AHexTile> UDefenderHexTile;
+	static TSubclassOf<AHexTile> DefenderHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> DefaultHexTile;
+	TSubclassOf<AHexTile> UDefaultHexTile;
+	static TSubclassOf<AHexTile> DefaultHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Setup")
-	TSubclassOf<AHexTile> SentinelHexTile;
+	TSubclassOf<AHexTile> USentinelHexTile;
+	static TSubclassOf<AHexTile> SentinelHexTile;
 
 
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;   
+	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;   
 	
-	void BlueprintsCheck();  // stops the program if the properties aren't setup
-	void InitHexGridArray();
-	void SpawnTiles();
+	static void BlueprintsCheck();  // stops the program if the properties aren't setup
+	static void InitHexGridArray();
+	static void SpawnTiles();
+	static void AdjustGridSize();
 
-	void AdjustGridSize();
-	bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
-	TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
+	static bool isGameplayTile(const int32 x, const int32 y, bool bOddRow);
+	static TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 public:
-	TArray<AHexTile*> DefenderTiles;  // TODO: move to protected
-	TArray<AHexTile*> AttackerTiles;
-	TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
+	static TArray<AHexTile*> DefenderTiles;  // TODO: move to protected
+	static TArray<AHexTile*> AttackerTiles;  // TODO: move to protected
+	static TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
 
 	AHexGridManager();
 
-	EHexTileType GetTileType(const FIntPoint& Cord) const;
-	AUnit* GetUnit(const FIntPoint& Cord);
+	static EHexTileType GetTileType(const FIntPoint& Cord) const;
+	static AUnit* GetUnit(const FIntPoint& Cord);
 	
-	void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
-	void RotateUnit(AUnit* Unit, int32 Side);
+	static void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
+	static void RotateUnit(AUnit* Unit, int32 Side);
 
-	bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
-	int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side
-	FIntPoint AdjacentCord(const FIntPoint& BaseCord, int32 Side); //? TODO add static
+	static bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
+	static int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side
+	static FIntPoint AdjacentCord(const FIntPoint& BaseCord, int32 Side); //? TODO add static
 	static int32 AdjacentCordSide(int32 Side);
 
 
@@ -94,7 +104,7 @@ public:
 	 * @param Side
 	 * @return 
 	 */
-	AUnit* GetShotTarget(FIntPoint StartCord, const int32 Side);
+	static AUnit* GetShotTarget(FIntPoint StartCord, const int32 Side);
 
 	/**
 	 * Get a Unit from a hex tile placed "Distance" tiles away.
@@ -104,7 +114,7 @@ public:
 	 * @param Distance
 	 * @return 
 	 */
-	AUnit* GetDistantUnit(FIntPoint StartCord, const int32 Side, const int32 Distance);
+	static AUnit* GetDistantUnit(FIntPoint StartCord, const int32 Side, const int32 Distance);
 
 	/**
 	 * Get a Tile placed "Distance" tiles away from StartCord.
@@ -114,7 +124,7 @@ public:
 	 * @param Distance
 	 * @return
 	 */
-	EHexTileType GetDistantTileType(FIntPoint StartCord, const int32 Side, const int32 Distance);
+	static EHexTileType GetDistantTileType(FIntPoint StartCord, const int32 Side, const int32 Distance);
 
 	/**
 	 * Lists Units around a specific Hex Tile.
@@ -122,7 +132,7 @@ public:
 	 * @param BaseCord
 	 * @return Returns 6 elements Array, elements can be nullptr
 	 */
-	TArray<AUnit*> AdjacentUnits(const FIntPoint& BaseCord);
+	static TArray<AUnit*> AdjacentUnits(const FIntPoint& BaseCord);
 
 	/**
 	 * .
@@ -132,11 +142,9 @@ public:
 	 * @param Distance
 	 * @return 
 	 */
-	FIntPoint GetDistantCord(FIntPoint& StartCord, const int32 Side, const int32 Distance);
+	static FIntPoint GetDistantCord(FIntPoint& StartCord, const int32 Side, const int32 Distance);
 
+	static void RemoveUnit(AUnit* Unit);
 
-
-	void RemoveUnit(AUnit* Unit);
-
-	void GenerateGrid();
+	static void GenerateGrid();
 };

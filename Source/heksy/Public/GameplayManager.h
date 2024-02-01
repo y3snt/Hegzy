@@ -53,10 +53,6 @@ protected:
 	bool SelectUnit(const FIntPoint& Cord);
 
 public:
-
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	AHexGridManager *GridManager;  // TODO: singleton, SMART POINTERS!!!
-
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
 	TArray<AUnit*> AttackerUnits;
 	

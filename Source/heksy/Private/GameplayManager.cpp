@@ -37,12 +37,12 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 
 	// Check if Cord is a neighbour of a SelectedUnit
 	// TODO: ? move to listener, so only tiles adj to current unit can be selected in gameplay phase
-	ResultSide = GridManager->AdjacentSide(SelectedUnit->CurrentCord, Cord);  
+	ResultSide = AHexGridManager::AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
 
 	// TODO: Check if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
-	AUnit* EnemyUnit = GridManager->GetUnit(Cord);
+	AUnit* EnemyUnit = AHexGridManager::GetUnit(Cord);
 	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
 		return true;
 
@@ -83,7 +83,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 
 	SelectedUnit->Action();
 
-	GridManager->ChangeUnitPosition(Unit, EndCord);
+	AHexGridManager::ChangeUnitPosition(Unit, EndCord);
 
 	if (EnemyDamage(Unit))
 	{//spr czy nie giniemy HegzyEvents.OnUnitMoved(CurrentCord);
@@ -98,7 +98,7 @@ void AGameplayManager::MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 sid
 bool AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	// TODO: return true if Unit was killed; update in symbols (and in other classes)
-	TArray<AUnit* > Units = GridManager->AdjacentUnits(Target->CurrentCord);
+	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(Target->CurrentCord);
 
 	for (int32 side = 0; side < 6; side++) 
 	{	
@@ -128,7 +128,7 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	{
 		AttackerUnits.Remove(Target);
 	}
-	GridManager->RemoveUnit(Target);
+	AHexGridManager::RemoveUnit(Target);
 
 	// TODO: Not here!  ? decorators
 	if (DefenderUnits.Num() == 0)
@@ -180,7 +180,7 @@ bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
 	 * @return true if unit has been selected in this operation
 	 */
 
-	AUnit* NewSelection = GridManager->GetUnit(Cord);
+	AUnit* NewSelection = AHexGridManager::GetUnit(Cord);
 	if (NewSelection != nullptr && NewSelection->Controller == CurrentPlayer)
 	{
 		SelectedUnit = NewSelection;
@@ -216,7 +216,7 @@ void AGameplayManager::Gameplay(FIntPoint Cord)
 		//PrintString(FString::Printf(TEXT("DIRECTION_%d"), side));
 		//testKillUnit(Cord);
 		
-		//GridManager->ChangeUnitPosition(SelectedUnit, Cord);
+		//AHexGridManager::ChangeUnitPosition(SelectedUnit, Cord);
 		//PrintString(FString::Printf(TEXT("_%d"), side));
 		//->RotateUnit(SelectedUnit, side);
 
@@ -237,7 +237,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	
 
 	// check if unit is already summoned
-	EHexTileType SelectedUnitTileType = GridManager->GetTileType(SelectedUnit->CurrentCord);  // todo getters/setters
+	EHexTileType SelectedUnitTileType = AHexGridManager::GetTileType(SelectedUnit->CurrentCord);  // todo getters/setters
 
 	if (SelectedUnitTileType != EHexTileType::SENTINEL)
 	{
@@ -246,7 +246,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	}
 
 
-	EHexTileType SelectedHexType = GridManager->GetTileType(Cord);
+	EHexTileType SelectedHexType = AHexGridManager::GetTileType(Cord);
 
 	bool bSelectedCurrentPlayerSpawn =
 		(SelectedHexType == EHexTileType::ATTACKER_SPAWN && CurrentPlayer == EPlayer::ATTACKER) ||
@@ -261,7 +261,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 	PrintString("You summoned a Unit");
 
 	// TeleportUnit(Cord);
-	GridManager->ChangeUnitPosition(SelectedUnit, Cord);
+	AHexGridManager::ChangeUnitPosition(SelectedUnit, Cord);
 
 	if (CurrentPlayer == EPlayer::ATTACKER)  // TODO: Move to setup
 		SelectedUnit->Rotate(0);
@@ -328,10 +328,10 @@ void AGameplayManager::SpawnUnits()
 	{
 		AttackerUnits[i]->Controller = EPlayer::ATTACKER;
 
-		FIntPoint SpawnCord = GridManager->AttackerTiles[i]->TileIndex; // Get spawn location
+		FIntPoint SpawnCord = AHexGridManager::AttackerTiles[i]->TileIndex; // Get spawn location
 		SpawnCord += AUnit::Direction(3);  // Move to a spot outside of the map near spawn point
 
-		GridManager->ChangeUnitPosition(AttackerUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
+		AHexGridManager::ChangeUnitPosition(AttackerUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
 		
 	}
 
@@ -340,10 +340,10 @@ void AGameplayManager::SpawnUnits()
 	{
 		DefenderUnits[i]->Controller = EPlayer::DEFENDER;
 
-		FIntPoint SpawnCord = GridManager->DefenderTiles[i]->TileIndex; // Get spawn location
+		FIntPoint SpawnCord = AHexGridManager::DefenderTiles[i]->TileIndex; // Get spawn location
 		SpawnCord += AUnit::Direction(0); // Move to a spot outside of the map near spawn point
 
-		GridManager->ChangeUnitPosition(DefenderUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
+		AHexGridManager::ChangeUnitPosition(DefenderUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
 	}
 
 	SelectedUnit = nullptr;
@@ -352,7 +352,7 @@ void AGameplayManager::SpawnUnits()
 
 void AGameplayManager::SetupGame()
 {
-	GridManager->GenerateGrid();
+	AHexGridManager::GenerateGrid();
 	SpawnUnits();
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
