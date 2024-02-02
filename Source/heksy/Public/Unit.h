@@ -9,7 +9,7 @@
 //#include "GameplayConstants.h"
 //#include "HexGridManager.h"
 
-#include "Symbol.h"
+
 
 //#include "HegzyEvents.h"
 
@@ -20,6 +20,7 @@
 
 #include "Unit.generated.h"
 
+class ASymbol;
 
 class UStaticMeshComponent;
 

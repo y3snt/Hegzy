@@ -3,7 +3,7 @@
 
 #include "Unit.h"
 #include "GameplayManager.h"
-
+#include "Symbol.h"
 
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()

@@ -2,6 +2,8 @@
 
 
 #include "Symbol.h"
+#include "HexGridManager.h"
+
 
 // Sets default values
 ASymbol::ASymbol()
@@ -12,9 +14,20 @@ ASymbol::ASymbol()
 // Called when the game starts or when spawned
 void ASymbol::BeginPlay()
 {
-	Super::BeginPlay();
+	//Super::BeginPlay();
 	
 }
+
+// Sword.cpp
+/*
+void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
+{
+
+	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+*/
 
 #pragma region ComponentTheory
 /*

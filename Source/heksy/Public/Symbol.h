@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Unit.h"
+#include "Action.h"
+
 #include "Symbol.generated.h"
+
+//class AUnit;
 
 UCLASS()
 class HEKSY_API ASymbol : public AActor
@@ -22,3 +28,15 @@ protected:
 };
 
 
+// Sword.h
+/*
+UCLASS(Blueprintable, Category = "MyGame")
+class ASword : public AActor, public IAction
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Action(AUnit* Unit, int32 Side) override;
+};
+
+*/
