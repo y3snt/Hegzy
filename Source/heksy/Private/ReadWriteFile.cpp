@@ -18,7 +18,7 @@ FString UReadWriteFile::ReadStringFromFile(FString FilePath, bool& bOutSuccess, 
         OutInfoMessage = FString::Printf(TEXT("Read String From File Failed - File doesn't exist - '%s'"), *FilePath);
         return "";
     }
-
+    
     FString RetString = "";
 
     // Try to read the file. Output goes in RetString

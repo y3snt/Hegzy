@@ -21,21 +21,24 @@ protected:
 
 };
 
+
+
 // Action.h
+
 #include "Action.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
 class UAction : public UInterface
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 };
 
 class IAction
-{    
-    GENERATED_BODY()
+{
+	GENERATED_BODY()
 
 public:
-    virtual void Action(AUnit* Unit, int32 Side);  // == 0 ?
+	virtual void Action(AUnit* Unit, int32 Side);  // == 0 ?
 };
 
 // Action.h
@@ -44,25 +47,25 @@ public:
 UINTERFACE(MinimalAPI, Blueprintable)
 class UPassiveAction : public UInterface
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 };
 
 class IPassiveAction
-{    
-    GENERATED_BODY()
+{
+	GENERATED_BODY()
 
 public:
-    virtual void PassiveAction(AUnit* Unit, int32 Side);  // == 0 ?
+	virtual void PassiveAction(AUnit* Unit, int32 Side);  // == 0 ?
 };
 
 // Sword.h
-UCLASS(Blueprintable, Category="MyGame")
+UCLASS(Blueprintable, Category = "MyGame")
 class ASword : public AActor, public IAction
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Add interface function overrides here. */
+	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
 }
 
@@ -75,13 +78,13 @@ void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 }
 
 // Spear.h
-UCLASS(Blueprintable, Category="MyGame")
+UCLASS(Blueprintable, Category = "MyGame")
 class ASpear : public AActor, public IAction, public IPassiveAction
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Add interface function overrides here. */
+	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
 	virtual void PassiveAction(AUnit* Unit, int32 Side) override;
 }
@@ -104,13 +107,13 @@ void ASpear::PassiveAction(AUnit* Unit, int32 Side)
 
 
 // Bow.h
-UCLASS(Blueprintable, Category="MyGame")
+UCLASS(Blueprintable, Category = "MyGame")
 class ABow : public AActor, public IAction
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Add interface function overrides here. */
+	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
 }
 
@@ -124,13 +127,13 @@ void ABow::Action(AUnit* Unit, int32 Side)
 
 
 // Push.h
-UCLASS(Blueprintable, Category="MyGame")
+UCLASS(Blueprintable, Category = "MyGame")
 class APush : public AActor, public IAction
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Add interface function overrides here. */
+	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
 }
 
@@ -138,7 +141,7 @@ public:
 void APush::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 {
 	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
-	if(!Target || Target->Controller == Unit->Controller)
+	if (!Target || Target->Controller == Unit->Controller)
 		return;
 
 	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);

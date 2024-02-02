@@ -150,4 +150,7 @@ public:
 	void Action();
 	void PassiveAction(int32 Side);
 
+	bool CanAttack();
+	ESymbols GetFrontSymbol();
+
 };

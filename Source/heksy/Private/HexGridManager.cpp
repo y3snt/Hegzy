@@ -31,7 +31,7 @@ TArray<AHexTile *> AHexGridManager::DefenderTiles;
 TArray<AHexTile *> AHexGridManager::AttackerTiles;
 TArray<TArray<AUnit *>> AHexGridManager::UnitGrid;
 
-EHexTileType AHexGridManager::GetTileType(const FIntPoint &Cord) const
+EHexTileType AHexGridManager::GetTileType(const FIntPoint &Cord)
 {
 	return HexGrid[Cord.X][Cord.Y]->TileType;
 }
@@ -159,7 +159,7 @@ FIntPoint AHexGridManager::AdjacentCord(const FIntPoint &BaseCord, int32 Side)
 	return BaseCord + Directions[Side];
 }
 
-static int32 AHexGridManager::AdjacentCordSide(int32 Side)
+int32 AHexGridManager::AdjacentCordSide(int32 Side)
 {
 	/**
 	 * Convert side of a cord to its corresponding adjacent cord side
@@ -229,6 +229,7 @@ void AHexGridManager::InitHexGridArray()
 		HexGrid[i].SetNumZeroed(GridHeight);
 	}
 }
+		
 
 void AHexGridManager::SpawnTiles()
 {
@@ -240,8 +241,8 @@ void AHexGridManager::SpawnTiles()
 
 			const float XTilePos = x * TileHorizontalOffset + y * OddRowHorizontalOffset;
 			const float YTilePos = y * TileVerticalOffset;
-
-			AHexTile *newTile = GetWorld()->SpawnActor<AHexTile>(GetTileToSpawn(x, y, oddRow),
+			UWorld* world = GEngine->GameViewport->GetWorld();
+			AHexTile *newTile = world->SpawnActor<AHexTile>(GetTileToSpawn(x, y, oddRow),
 																 FVector(FIntPoint(XTilePos, YTilePos)),
 																 FRotator::ZeroRotator);
 			newTile->TileIndex = FIntPoint(x, y);

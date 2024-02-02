@@ -53,7 +53,7 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 
 	// checking if can attack from the front, cause SelectedUnit will rotate first
 	
-	int32 EnemySide = GridManager.AdjacentCordSide(ResultSide);
+	int32 EnemySide = AHexGridManager::AdjacentCordSide(ResultSide);
 	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide, SelectedUnit->GetSymbol(ResultSide)))
 		return false;
 
@@ -79,34 +79,33 @@ void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 side)
 
 	SelectedUnit->Rotate(side); // 1
 
-	EnemyDamage();
+	EnemyDamage(SelectedUnit);
 	if(SelectUnit == nullptr) return;  // unit wass killed
 
 	SelectedUnit->Action();
 
 	AHexGridManager::ChangeUnitPosition(SelectedUnit, EndCord);
 
-	EnemyDamage();
+	EnemyDamage(SelectedUnit);
 	if(SelectUnit == nullptr) return;  // unit wass killed
 
 	SelectedUnit->Action();
 
 }
 
-void AGameplayManager::EnemyDamage()
+void AGameplayManager::EnemyDamage(AUnit* Target)
 { // Returns true is Enemy spear can kill the Target
 	// TODO: return true if Unit was killed; update in symbols (and in other classes)
-	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(SelectedUnit->CurrentCord);
-
+	FIntPoint Cord = Target->CurrentCord;
+	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(Cord);
+	
 	for (int32 side = 0; side < 6; side++) 
 	{	
-		if (SelectUnit == nullptr) break;
-
-		if (Units[side] && Units[side]->Controller != SelectedUnit->Controller)
+		if (Units[side] && Units[side]->Controller != Target->Controller)
 		{	
 			int32 EnemySide = side + 3;
-			Units[side]->PassiveAction(EnemySide)
-
+			Units[side]->PassiveAction(EnemySide);
+			if (AHexGridManager::GetUnit(Cord) == nullptr) break;
 		}
 	}
 }

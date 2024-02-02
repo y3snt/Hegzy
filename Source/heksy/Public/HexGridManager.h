@@ -85,7 +85,7 @@ public:
 
 	AHexGridManager();
 
-	static EHexTileType GetTileType(const FIntPoint& Cord) const;
+	static EHexTileType GetTileType(const FIntPoint& Cord);
 	static AUnit* GetUnit(const FIntPoint& Cord);
 	
 	static void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);

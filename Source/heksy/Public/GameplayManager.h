@@ -53,7 +53,7 @@ protected:
 
 	bool SelectUnit(const FIntPoint& Cord);
 
-	void CheckWin();
+	static void CheckWin();
 
 public:  // TODO: why all of those are public
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
@@ -80,7 +80,7 @@ public:  // TODO: why all of those are public
 
 	static void KillUnit(AUnit* Target);
 	
-	bool EnemyDamage(AUnit* Target);
+	static void EnemyDamage(AUnit* Target);
 
-	void MoveUnit(AUnit *Unit, const FIntPoint& EndCord, int32 side);
+	void MoveUnit(const FIntPoint& EndCord, int32 side);
 };

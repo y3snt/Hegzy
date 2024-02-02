@@ -2,6 +2,7 @@
 
 
 #include "Unit.h"
+#include "GameplayManager.h"
 
 
 // Called when the game starts or when spawned
@@ -69,7 +70,8 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
-ESymbols AUnit::GetFrontSymbol() { 
+ESymbols AUnit::GetFrontSymbol()
+{ 
 	/**
 	 * Get Symbol on a front of the Unit
 	 * 
@@ -78,7 +80,8 @@ ESymbols AUnit::GetFrontSymbol() {
 	return Symbols[0];
 }
 
-ESymbols AUnit::GetSymbol(int32 side) { 
+ESymbols AUnit::GetSymbol(int32 side)
+{ 
 	/**
 	 * Get the Symbol on a given side of Unit
 	 * 
@@ -146,8 +149,8 @@ void AUnit::Action()
 	{
 		ESymbols Symbol = GetSymbol(side);
 
-		if(Cast<IAction>(Symbol))
-			UnitSymbol.Action(this, side);
+		//if(Cast<IAction>(Symbol))
+		//	Symbol.Action(this, side);
 
 	}
 }
@@ -156,8 +159,8 @@ void AUnit::PassiveAction(int32 Side)
 {
 	ESymbols Symbol = GetSymbol(Side);
 
-	if(Cast<IPassiveAction>(Symbol))
-		UnitSymbol.PassiveAction(this, Side);
+	//if(Cast<IPassiveAction>(Symbol))
+	//	Symbol.PassiveAction(this, Side);
 }
 
 /**
