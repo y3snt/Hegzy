@@ -55,10 +55,10 @@ void UReadWriteFile::WriteStringToFile(FString FilePath, FString String, bool& b
 
 
 
-void UReadWriteFile::InputConnectListener(FIntPoint Cord, AGameplayManager *Manager, bool& bOutSuccess, FString& OutInfoMessage)
+void UReadWriteFile::InputConnectListener(FIntPoint Cord, bool& bOutSuccess, FString& OutInfoMessage)
 {
     
-    Manager->InputListener(Cord);
+    AGameplayManager::InputListener(Cord);
     
     bOutSuccess = true;
     OutInfoMessage = FString::Printf(TEXT("Pass Cord To Gameplay Manager Succeeded"));

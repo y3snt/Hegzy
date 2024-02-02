@@ -35,52 +35,52 @@ class HEKSY_API AGameplayManager : public AActor
 	GENERATED_BODY()
 
 protected:
-	int32 UnitsLeftToBeSummoned;
-	EPlayer CurrentPlayer = EPlayer::ATTACKER;
+	static int32 UnitsLeftToBeSummoned;
+	static EPlayer CurrentPlayer;
 	static AUnit* SelectedUnit;
 
 	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")
-	EAutomaticTestsList AutomaticTest;
+	EAutomaticTestsList UAutomaticTest;
+	
+	static EAutomaticTestsList AutomaticTest;
 
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override; 
 
-	void SpawnUnits();
+	static void SimpleAutomaticTests();
 
-	void SimpleAutomaticTests();
-
-	bool SelectUnit(const FIntPoint& Cord);
+	static bool SelectUnit(const FIntPoint& Cord);
 
 	static void CheckWin();
 
 public:  // TODO: why all of those are public
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> UAttackerUnits;
-	static TArray<AUnit*> AttackerUnits;
+	int32 UAttackerUnitsAlive;
+	static int32 AttackerUnitsAlive;
 	
 	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> UDefenderUnits;
-	static TArray<AUnit*> DefenderUnits;
+	int32 UDefenderUnitsAlive;
+	static int32 DefenderUnitsAlive;
 
 	AGameplayManager();
 
-	void InputListener(FIntPoint Cord);
+	static void InputListener(FIntPoint Cord);
 
-	void SummonUnit(FIntPoint Cord);
+	static void SummonUnit(FIntPoint Cord);
 
-	void SetupGame();
+	static void SetupGame();
 
-	void SwitchPlayerTurn();
+	static void SwitchPlayerTurn();
 
-	void Gameplay(FIntPoint Cord);
+	static void Gameplay(FIntPoint Cord);
 
-	bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
+	static bool IsLegalMove(FIntPoint Cord, int32& ResultSide);
 
 	static void KillUnit(AUnit* Target);
 	
 	static void EnemyDamage(AUnit* Target);
 
-	void MoveUnit(const FIntPoint& EndCord, int32 side);
+	static void MoveUnit(const FIntPoint& EndCord, int32 side);
 };

@@ -15,10 +15,13 @@
 
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
+int32 AGameplayManager::UnitsLeftToBeSummoned;
+EPlayer AGameplayManager::CurrentPlayer = EPlayer::ATTACKER;
+EAutomaticTestsList AGameplayManager::AutomaticTest;
 
 AUnit* AGameplayManager::SelectedUnit = nullptr;
-TArray<AUnit*> AGameplayManager::AttackerUnits;
-TArray<AUnit*> AGameplayManager::DefenderUnits;
+int32 AGameplayManager::AttackerUnitsAlive;
+int32 AGameplayManager::DefenderUnitsAlive;
 
 
 #pragma region Tools
@@ -80,14 +83,14 @@ void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 side)
 	SelectedUnit->Rotate(side); // 1
 
 	EnemyDamage(SelectedUnit);
-	if(SelectUnit == nullptr) return;  // unit wass killed
+	if(SelectedUnit == nullptr) return;  // unit wass killed
 
 	SelectedUnit->Action();
 
 	AHexGridManager::ChangeUnitPosition(SelectedUnit, EndCord);
 
 	EnemyDamage(SelectedUnit);
-	if(SelectUnit == nullptr) return;  // unit wass killed
+	if(SelectedUnit == nullptr) return;  // unit wass killed
 
 	SelectedUnit->Action();
 
@@ -117,11 +120,11 @@ void AGameplayManager::KillUnit(AUnit* Target)
 
 	if (Target->Controller == EPlayer::DEFENDER)
 	{
-		DefenderUnits.Remove(Target);
+		DefenderUnitsAlive--;
 	}
 	else
 	{
-		AttackerUnits.Remove(Target);
+		AttackerUnitsAlive--;
 	}
 	AHexGridManager::RemoveUnit(Target);
 
@@ -130,9 +133,9 @@ void AGameplayManager::KillUnit(AUnit* Target)
 }
 
 void AGameplayManager::CheckWin() {
-	if (DefenderUnits.Num() == 0)
+	if (DefenderUnitsAlive == 0)
 		PrintString("Attacker won");
-	else if (AttackerUnits.Num() == 0)
+	else if (AttackerUnitsAlive == 0)
 		PrintString("Defender won");
 }
 
@@ -279,7 +282,7 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 
 
-
+/*
 void AGameplayManager::SimpleAutomaticTests()
 {
 	if (AutomaticTest == EAutomaticTestsList::EMPTY)
@@ -306,6 +309,7 @@ void AGameplayManager::SimpleAutomaticTests()
 		return;
 	}
 }
+*/
 #pragma endregion
 
 
@@ -313,48 +317,14 @@ void AGameplayManager::SimpleAutomaticTests()
 #pragma region GameSetup
 
 
-void AGameplayManager::SpawnUnits()
-{
-	/*
-	* Placing Units used in combat on their "Spawn Points" near the area of the gameplay board where they are visible to the players.
-	*/
-
-	UnitsLeftToBeSummoned = AttackerUnits.Num() + DefenderUnits.Num();  // Flag that manages the state of the game
-	
-	// spawning attacker units
-	for (int32 i = 0; i < AttackerUnits.Num(); i++)
-	{
-		AttackerUnits[i]->Controller = EPlayer::ATTACKER;
-
-		FIntPoint SpawnCord = AHexGridManager::AttackerTiles[i]->TileIndex; // Get spawn location
-		SpawnCord += AUnit::Direction(3);  // Move to a spot outside of the map near spawn point
-
-		AHexGridManager::ChangeUnitPosition(AttackerUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
-		
-	}
-
-	// spawning defender units
-	for (int32 i = 0; i < DefenderUnits.Num(); i++)
-	{
-		DefenderUnits[i]->Controller = EPlayer::DEFENDER;
-
-		FIntPoint SpawnCord = AHexGridManager::DefenderTiles[i]->TileIndex; // Get spawn location
-		SpawnCord += AUnit::Direction(0); // Move to a spot outside of the map near spawn point
-
-		AHexGridManager::ChangeUnitPosition(DefenderUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
-	}
-
-	SelectedUnit = nullptr;
-}
-
 
 void AGameplayManager::SetupGame()
 {
-	AHexGridManager::GenerateGrid();
-	SpawnUnits();
+	//AHexGridManager::GenerateGrid();
+	//AHexGridManager::SpawnUnits();
 
 	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
-	SimpleAutomaticTests();
+	//SimpleAutomaticTests();
 }
 
 /*
@@ -369,15 +339,18 @@ void AGameplayManager::TimerFunction()
 }
 */
 
-void AGameplayManager::PostInitializeComponents() {
-	AttackerUnits = UAttackerUnits;
-	DefenderUnits = UDefenderUnits;
+void AGameplayManager::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttackerUnitsAlive = UAttackerUnitsAlive;
+	DefenderUnitsAlive = UDefenderUnitsAlive;
+	UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;  // Flag that manages the state of the game
 }
 
 
 void AGameplayManager::BeginPlay()
 {
-	SetupGame();
+	//SetupGame();
 }
 
 

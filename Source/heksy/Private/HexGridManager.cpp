@@ -11,7 +11,7 @@ const TArray<FIntPoint> AHexGridManager::Directions = {
 	FIntPoint(0, -1),
 	FIntPoint(1, -1)};
 
-EHexTileType AHexGridManager::current_spawn;
+EHexTileType AHexGridManager::current_spawn = EHexTileType::SENTINEL;
 
 TArray<TArray<AHexTile *>> AHexGridManager::HexGrid;
 
@@ -30,6 +30,9 @@ TSubclassOf<AHexTile> AHexGridManager::SentinelHexTile;
 TArray<AHexTile *> AHexGridManager::DefenderTiles;
 TArray<AHexTile *> AHexGridManager::AttackerTiles;
 TArray<TArray<AUnit *>> AHexGridManager::UnitGrid;
+
+TArray<AUnit*> AHexGridManager::DefenderUnits;
+TArray<AUnit*> AHexGridManager::AttackerUnits;
 
 EHexTileType AHexGridManager::GetTileType(const FIntPoint &Cord)
 {
@@ -323,6 +326,39 @@ TSubclassOf<AHexTile> AHexGridManager::GetTileToSpawn(const int32 x, const int32
 	return TileToSpawn;
 }
 
+void AHexGridManager::SpawnUnits()
+{
+	/*
+	* Placing Units used in combat on their "Spawn Points" near the area of the gameplay board where they are visible to the players.
+	*/
+	
+	// spawning attacker units
+	for (int32 i = 0; i < AttackerUnits.Num(); i++)
+	{
+		AttackerUnits[i]->Controller = EPlayer::ATTACKER;
+
+		FIntPoint SpawnCord = AttackerTiles[i]->TileIndex; // Get spawn location
+		SpawnCord += Directions[3];  // Move to a spot outside of the map near spawn point
+		//SpawnCord += AUnit::Direction(3);
+
+		ChangeUnitPosition(AttackerUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
+		
+	}
+
+	// spawning defender units
+	for (int32 i = 0; i < DefenderUnits.Num(); i++)
+	{
+		DefenderUnits[i]->Controller = EPlayer::DEFENDER;
+
+		FIntPoint SpawnCord = DefenderTiles[i]->TileIndex; // Get spawn location
+		SpawnCord += Directions[0]; // Move to a spot outside of the map near spawn point
+
+		ChangeUnitPosition(DefenderUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
+	}
+
+}
+
+
 // Called when the game starts or when spawned
 void AHexGridManager::GenerateGrid()
 {
@@ -337,6 +373,7 @@ void AHexGridManager::GenerateGrid()
 
 void AHexGridManager::PostInitializeComponents()
 { // PrintString, maybe in constructor?
+	Super::PostInitializeComponents();
 	GridWidth = UGridWidth;
 	GridHeight = UGridHeight;
 	OddRowHorizontalOffset = UOddRowHorizontalOffset;
@@ -347,11 +384,22 @@ void AHexGridManager::PostInitializeComponents()
 	DefenderHexTile = UDefenderHexTile;
 	DefaultHexTile = UDefaultHexTile;
 	SentinelHexTile = USentinelHexTile;
+
+	DefenderUnits = UDefenderUnits;
+	AttackerUnits = UAttackerUnits;
+
+	HexGrid.Empty();
+	DefenderTiles.Empty();
+	AttackerTiles.Empty();
+	UnitGrid.Empty();
 }
 
 void AHexGridManager::BeginPlay()
 {
-	// GenerateGrid();
+	Super::BeginPlay();
+	
+	GenerateGrid();
+	SpawnUnits();
 }
 
 // Sets default values
