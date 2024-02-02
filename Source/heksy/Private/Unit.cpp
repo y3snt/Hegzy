@@ -70,7 +70,7 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
-ESymbols AUnit::GetFrontSymbol()
+ASymbol AUnit::GetFrontSymbol()
 { 
 	/**
 	 * Get Symbol on a front of the Unit
@@ -80,7 +80,7 @@ ESymbols AUnit::GetFrontSymbol()
 	return Symbols[0];
 }
 
-ESymbols AUnit::GetSymbol(int32 side)
+ASymbol AUnit::GetSymbol(int32 side)
 { 
 	/**
 	 * Get the Symbol on a given side of Unit
@@ -103,6 +103,7 @@ bool AUnit::CanAttack()
 	 */
 	
 	// Active == can affect unit
+	/*
 	TArray<ESymbols> AttackSymbols = {
 		ESymbols::SWORD,
 		ESymbols::SPEAR,
@@ -111,6 +112,12 @@ bool AUnit::CanAttack()
 	};
 
 	return AttackSymbols.Find(GetFrontSymbol()) != INDEX_NONE;
+	*/
+
+	if(Cast<IAction>(GetFrontSymbol()))  // currently all action symbols can attack
+		return true;
+	
+	return false;
 }
 
 

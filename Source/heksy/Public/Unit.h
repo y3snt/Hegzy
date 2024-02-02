@@ -101,7 +101,8 @@ protected:
 
 public:	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TArray<ESymbols> Symbols;
+	TArray<TSubclass<ASymbol>> Symbols;
+	//TArray<ESymbols> Symbols;
 
 
 //	static FIntPoint Direction(int32 Side); //TODO think about how to make it static
@@ -139,9 +140,8 @@ public:
 	
 	void Rotate(int32 Side);
 
-	ESymbols GetSymbol(int32 side);
-	
-
+	ASymbol GetSymbol(int32 side);
+	ASymbol GetFrontSymbol();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -152,6 +152,5 @@ public:
 	void PassiveAction(int32 Side);
 
 	bool CanAttack();
-	ESymbols GetFrontSymbol();
 
 };

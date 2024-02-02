@@ -12,6 +12,8 @@
 
 //class AUnit;
 
+class UStaticMeshComponent;
+
 UCLASS()
 class HEKSY_API ASymbol : public AActor
 {
@@ -20,10 +22,17 @@ class HEKSY_API ASymbol : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASymbol();
+	virtual ESymbols ToEnum();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	ESymbols SymbolEnum;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+	UStaticMeshComponent *TileMesh;  // U: visible mesh
+
+	// TODO: protected constructor
 
 };
 
@@ -44,7 +53,7 @@ void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 
 	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
 	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
+		Target->Damage(Side, this->ToEnum());
 }
 
 
@@ -65,14 +74,14 @@ void ASpear::Action(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
 	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
+		Target->Damage(Side, this->ToEnum());
 }
 
 void ASpear::PassiveAction(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
 	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
+		Target->Damage(Side, this->ToEnum());
 }
 
 
@@ -93,7 +102,7 @@ void ABow::Action(AUnit* Unit, int32 Side)
 {
 	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
-		Target->Damage(Side);
+		Target->Damage(Side, this->ToEnum());
 }
 
 
@@ -125,7 +134,7 @@ void APush::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 	}
 	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
 	{
-		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+		AHexGridManager::ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
 		AGameplayManager::EnemyDamage(Target);
 	}
 }

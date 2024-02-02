@@ -18,6 +18,10 @@ void ASymbol::BeginPlay()
 	
 }
 
+ESymbols ASymbol::ToEnum() {
+	return SymbolEnum;
+}
+
 // Sword.cpp
 /*
 void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
