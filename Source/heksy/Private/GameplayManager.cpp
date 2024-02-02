@@ -108,7 +108,9 @@ void AGameplayManager::EnemyDamage(AUnit* Target)
 		{	
 			int32 EnemySide = side + 3;
 			Units[side]->PassiveAction(EnemySide);
-			if (AHexGridManager::GetUnit(Cord) == nullptr) break;
+
+			bool bTargetAlive = AHexGridManager::GetUnit(Cord);
+			if (!bTargetAlive) break;
 		}
 	}
 }

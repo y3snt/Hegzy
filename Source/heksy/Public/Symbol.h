@@ -29,7 +29,6 @@ protected:
 
 
 // Sword.h
-/*
 UCLASS(Blueprintable, Category = "MyGame")
 class ASword : public AActor, public IAction
 {
@@ -39,4 +38,94 @@ public:
 	virtual void Action(AUnit* Unit, int32 Side) override;
 };
 
-*/
+// Sword.cpp
+void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
+{
+
+	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+
+
+// Spear.h
+UCLASS(Blueprintable, Category = "MyGame")
+class ASpear : public AActor, public IAction, public IPassiveAction
+{
+	GENERATED_BODY()
+
+public:
+	/** Add interface function overrides here. */
+	virtual void Action(AUnit* Unit, int32 Side) override;
+	virtual void PassiveAction(AUnit* Unit, int32 Side) override;
+}
+
+// Spear.cpp
+void ASpear::Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+
+void ASpear::PassiveAction(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+
+
+
+// Bow.h
+UCLASS(Blueprintable, Category = "MyGame")
+class ABow : public AActor, public IAction
+{
+	GENERATED_BODY()
+
+public:
+	/** Add interface function overrides here. */
+	virtual void Action(AUnit* Unit, int32 Side) override;
+}
+
+// Bow.cpp
+void ABow::Action(AUnit* Unit, int32 Side)
+{
+	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
+	if (Target && Target->Controller != Unit->Controller)
+		Target->Damage(Side);
+}
+
+
+// Push.h
+UCLASS(Blueprintable, Category = "MyGame")
+class APush : public AActor, public IAction
+{
+	GENERATED_BODY()
+
+public:
+	/** Add interface function overrides here. */
+	virtual void Action(AUnit* Unit, int32 Side) override;
+}
+
+// Push.cpp
+void APush::Action(AUnit* Unit, int32 Side) // Adjacent Attack
+{
+	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	if (!Target || Target->Controller == Unit->Controller)
+		return;
+
+	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
+	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
+
+	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
+	if (BehindUnit || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
+	{
+		AGameplayManager::KillUnit(Target);
+	}
+	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
+	{
+		GridManager->ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+		AGameplayManager::EnemyDamage(Target);
+	}
+}
