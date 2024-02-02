@@ -56,12 +56,7 @@ protected:
 	static void CheckWin();
 
 public:  // TODO: why all of those are public
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	int32 UAttackerUnitsAlive;
 	static int32 AttackerUnitsAlive;
-	
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	int32 UDefenderUnitsAlive;
 	static int32 DefenderUnitsAlive;
 
 	AGameplayManager();

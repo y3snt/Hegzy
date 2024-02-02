@@ -70,7 +70,7 @@ void AUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
-ASymbol AUnit::GetFrontSymbol()
+ASymbol* AUnit::GetFrontSymbol()
 { 
 	/**
 	 * Get Symbol on a front of the Unit
@@ -80,7 +80,7 @@ ASymbol AUnit::GetFrontSymbol()
 	return Symbols[0];
 }
 
-ASymbol AUnit::GetSymbol(int32 side)
+ASymbol* AUnit::GetSymbol(int32 side)
 { 
 	/**
 	 * Get the Symbol on a given side of Unit
@@ -114,8 +114,8 @@ bool AUnit::CanAttack()
 	return AttackSymbols.Find(GetFrontSymbol()) != INDEX_NONE;
 	*/
 
-	if(Cast<IAction>(GetFrontSymbol()))  // currently all action symbols can attack
-		return true;
+	//!if(Cast<IAction>(GetFrontSymbol()))  // currently all action symbols can attack
+		//return true;
 	
 	return false;
 }
@@ -130,7 +130,7 @@ bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
 	 * @return true if can block
 	 */
 	
-	ESymbols Symbol = GetSymbol(Side);
+	ESymbols Symbol = GetSymbol(Side)->ToEnum();
 	if (Symbol == ESymbols::SHIELD && AttackerSymbol != ESymbols::PUSH)  // Does Unit have a shield?
 		return true;
 	
@@ -154,7 +154,7 @@ void AUnit::Action()
 {
 	for (int32 side = 0; side < 6; side++)
 	{
-		ESymbols Symbol = GetSymbol(side);
+		ASymbol* Symbol = GetSymbol(side);
 
 		//if(Cast<IAction>(Symbol))
 		//	Symbol.Action(this, side);
@@ -164,7 +164,7 @@ void AUnit::Action()
 
 void AUnit::PassiveAction(int32 Side)
 {
-	ESymbols Symbol = GetSymbol(Side);
+	ASymbol* Symbol = GetSymbol(Side);
 
 	//if(Cast<IPassiveAction>(Symbol))
 	//	Symbol.PassiveAction(this, Side);

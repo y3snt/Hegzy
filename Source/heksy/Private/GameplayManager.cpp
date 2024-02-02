@@ -12,6 +12,7 @@
 
 
 #include "GameplayManager.h"
+#include "Symbol.h"
 
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
@@ -20,8 +21,8 @@ EPlayer AGameplayManager::CurrentPlayer = EPlayer::ATTACKER;
 EAutomaticTestsList AGameplayManager::AutomaticTest;
 
 AUnit* AGameplayManager::SelectedUnit = nullptr;
-int32 AGameplayManager::AttackerUnitsAlive;
-int32 AGameplayManager::DefenderUnitsAlive;
+int32 AGameplayManager::AttackerUnitsAlive = 0;
+int32 AGameplayManager::DefenderUnitsAlive = 0;
 
 
 #pragma region Tools
@@ -57,7 +58,10 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	// checking if can attack from the front, cause SelectedUnit will rotate first
 	
 	int32 EnemySide = AHexGridManager::AdjacentCordSide(ResultSide);
-	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide, SelectedUnit->GetSymbol(ResultSide)))
+	ASymbol* AttackSymbolPointer = SelectedUnit->GetSymbol(ResultSide);
+	ESymbols AttackSymbol = AttackSymbolPointer->ToEnum();
+
+	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide, AttackSymbol))
 		return false;
 
 	return true;
@@ -109,8 +113,8 @@ void AGameplayManager::EnemyDamage(AUnit* Target)
 			int32 EnemySide = side + 3;
 			Units[side]->PassiveAction(EnemySide);
 
-			bool bTargetAlive = AHexGridManager::GetUnit(Cord);
-			if (!bTargetAlive) break;
+			bool bTargetKilled = AHexGridManager::GetUnit(Cord) == nullptr;
+			if (bTargetKilled) break;
 		}
 	}
 }
@@ -344,15 +348,16 @@ void AGameplayManager::TimerFunction()
 void AGameplayManager::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	AttackerUnitsAlive = UAttackerUnitsAlive;
-	DefenderUnitsAlive = UDefenderUnitsAlive;
-	UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;  // Flag that manages the state of the game
+	// UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;  // Flag that manages the state of the game
 }
 
 
 void AGameplayManager::BeginPlay()
 {
 	//SetupGame();
+	AttackerUnitsAlive = AHexGridManager::AttackerUnits.Num();
+	DefenderUnitsAlive = AHexGridManager::DefenderUnits.Num();
+	UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;
 }
 
 

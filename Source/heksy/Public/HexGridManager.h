@@ -65,15 +65,6 @@ private:
 	TSubclassOf<AHexTile> USentinelHexTile;
 	static TSubclassOf<AHexTile> SentinelHexTile;
 
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> UDefenderUnits;
-	static TArray<AUnit*> DefenderUnits;
-	
-	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
-	TArray<AUnit*> UAttackerUnits;
-	static TArray<AUnit*> AttackerUnits;
-
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;   
@@ -90,6 +81,14 @@ public:
 	static TArray<AHexTile*> DefenderTiles;  // TODO: move to protected
 	static TArray<AHexTile*> AttackerTiles;  // TODO: move to protected
 	static TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
+
+	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
+	TArray<AUnit*> UDefenderUnits;
+	static TArray<AUnit*> DefenderUnits;
+	
+	UPROPERTY(EditAnywhere, Category = "GameplayProperties|Map")
+	TArray<AUnit*> UAttackerUnits;
+	static TArray<AUnit*> AttackerUnits;
 
 	static void SpawnUnits();
 

@@ -2,7 +2,7 @@
 
 
 #include "Symbol.h"
-#include "HexGridManager.h"
+//#include "HexGridManager.h"
 
 
 // Sets default values
@@ -14,7 +14,7 @@ ASymbol::ASymbol()
 // Called when the game starts or when spawned
 void ASymbol::BeginPlay()
 {
-	//Super::BeginPlay();
+	Super::BeginPlay();
 	
 }
 

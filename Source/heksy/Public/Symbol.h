@@ -7,6 +7,7 @@
 
 #include "Unit.h"
 #include "Action.h"
+#include "PassiveAction.h"
 
 #include "Symbol.generated.h"
 
@@ -27,7 +28,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	ESymbols SymbolEnum;
+	ESymbols SymbolEnum = ESymbols::INVALID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	UStaticMeshComponent *TileMesh;  // U: visible mesh
@@ -38,15 +39,15 @@ protected:
 
 
 // Sword.h
+/*
 UCLASS(Blueprintable, Category = "MyGame")
-class ASword : public AActor, public IAction
+class ASword : public ASymbol, public IAction
 {
 	GENERATED_BODY()
 
 public:
 	virtual void Action(AUnit* Unit, int32 Side) override;
 };
-
 // Sword.cpp
 void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 {
@@ -59,15 +60,14 @@ void ASword::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 
 // Spear.h
 UCLASS(Blueprintable, Category = "MyGame")
-class ASpear : public AActor, public IAction, public IPassiveAction
+class ASpear : public ASymbol, public IAction, public IPassiveAction
 {
 	GENERATED_BODY()
 
 public:
-	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
 	virtual void PassiveAction(AUnit* Unit, int32 Side) override;
-}
+};
 
 // Spear.cpp
 void ASpear::Action(AUnit* Unit, int32 Side)
@@ -88,19 +88,18 @@ void ASpear::PassiveAction(AUnit* Unit, int32 Side)
 
 // Bow.h
 UCLASS(Blueprintable, Category = "MyGame")
-class ABow : public AActor, public IAction
+class ABow : public ASymbol, public IAction
 {
 	GENERATED_BODY()
 
 public:
-	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
-}
+};
 
 // Bow.cpp
 void ABow::Action(AUnit* Unit, int32 Side)
 {
-	AUnit* Target = GridManager->GetShotTarget(Unit->CurrentCord, Side);
+	AUnit* Target = AHexGridManager::GetShotTarget(Unit->CurrentCord, Side);
 	if (Target && Target->Controller != Unit->Controller)
 		Target->Damage(Side, this->ToEnum());
 }
@@ -108,24 +107,23 @@ void ABow::Action(AUnit* Unit, int32 Side)
 
 // Push.h
 UCLASS(Blueprintable, Category = "MyGame")
-class APush : public AActor, public IAction
+class APush : public ASymbol, public IAction
 {
 	GENERATED_BODY()
 
 public:
-	/** Add interface function overrides here. */
 	virtual void Action(AUnit* Unit, int32 Side) override;
-}
+};
 
 // Push.cpp
 void APush::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 {
-	AUnit* Target = GridManager->GetAdjacentUnit(Unit->CurrentCord, Side);
+	AUnit* Target = AHexGridManager::GetUnit(AHexGridManager::AdjacentCord(Unit->CurrentCord, Side));
 	if (!Target || Target->Controller == Unit->Controller)
 		return;
 
-	EHexTileType BehindTile = GridManager->GetDistantTileType(Unit->CurrentCord, side, 2);
-	AUnit* BehindUnit = GridManager->GetDistantUnit(Unit->CurrentCord, side, 2);
+	EHexTileType BehindTile = AHexGridManager::GetDistantTileType(Unit->CurrentCord, Side, 2);
+	AUnit* BehindUnit = AHexGridManager::GetDistantUnit(Unit->CurrentCord, Side, 2);
 
 	// TODO: Move to hex grid MG (which will validate position and kill if on a bad position)
 	if (BehindUnit || BehindTile == EHexTileType::SENTINEL)  // Pushing outside the map or in the Unit
@@ -134,7 +132,8 @@ void APush::Action(AUnit* Unit, int32 Side) // Adjacent Attack
 	}
 	else if (BehindUnit == nullptr) // Simple push TODO: we don't need else if here, just else
 	{
-		AHexGridManager::ChangeUnitPosition(Target, GridManager->GetDistantCord(Unit->CurrentCord, side, 2));
+		AHexGridManager::ChangeUnitPosition(Target, AHexGridManager::GetDistantCord(Unit->CurrentCord, Side, 2));
 		AGameplayManager::EnemyDamage(Target);
 	}
 }
+*/

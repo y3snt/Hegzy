@@ -23,6 +23,5 @@ class HEKSY_API IPassiveAction
 	GENERATED_BODY()
 
 public:
-	virtual void PassiveAction(AUnit* Unit, int32 Side) = 0;  // == 0 ?
-	//virtual void PassiveAction(int32 Side) = 0;
+	virtual void PassiveAction(AUnit* Unit, int32 Side) = 0;
 };

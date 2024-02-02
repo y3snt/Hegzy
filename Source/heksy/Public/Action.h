@@ -22,6 +22,5 @@ class HEKSY_API IAction
 	GENERATED_BODY()
 
 public:
-	virtual void Action(AUnit* Unit, int32 Side) = 0;  // == 0 
-	//virtual void Action(int32 Side) = 0;
+	virtual void Action(AUnit* Unit, int32 Side) = 0; 
 };

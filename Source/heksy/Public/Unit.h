@@ -78,7 +78,7 @@ protected:
 	TSubclassOf<ASymbol> FrontLeftSymbol;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")  // U: property, that will be visible in the editor
-		TSubclassOf<ASymbol> BackSymbol;
+	TSubclassOf<ASymbol> BackSymbol;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	TSubclassOf<ASymbol> BackRightSymbol;
@@ -101,7 +101,7 @@ protected:
 
 public:	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TArray<TSubclass<ASymbol>> Symbols;
+	TArray<ASymbol*> Symbols;
 	//TArray<ESymbols> Symbols;
 
 
@@ -140,8 +140,8 @@ public:
 	
 	void Rotate(int32 Side);
 
-	ASymbol GetSymbol(int32 side);
-	ASymbol GetFrontSymbol();
+	ASymbol* GetSymbol(int32 side);
+	ASymbol* GetFrontSymbol();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
