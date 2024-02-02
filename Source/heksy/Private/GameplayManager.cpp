@@ -17,8 +17,7 @@
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
 
 int32 AGameplayManager::UnitsLeftToBeSummoned;
-EPlayer AGameplayManager::CurrentPlayer = EPlayer::ATTACKER;
-EAutomaticTestsList AGameplayManager::AutomaticTest;
+EPlayer AGameplayManager::CurrentPlayer;
 
 AUnit* AGameplayManager::SelectedUnit = nullptr;
 int32 AGameplayManager::AttackerUnitsAlive = 0;
@@ -58,7 +57,10 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	// checking if can attack from the front, cause SelectedUnit will rotate first
 	
 	int32 EnemySide = AHexGridManager::AdjacentCordSide(ResultSide);
-	ASymbol* AttackSymbolPointer = SelectedUnit->GetSymbol(ResultSide);
+	ASymbol* AttackSymbolPointer = SelectedUnit->GetFrontSymbol();
+
+	if(AttackSymbolPointer == nullptr) return false;
+
 	ESymbols AttackSymbol = AttackSymbolPointer->ToEnum();
 
 	if (!SelectedUnit->CanAttack() || EnemyUnit->CanDefend(EnemySide, AttackSymbol))
@@ -165,6 +167,10 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
 	{
+		if (GEngine) // prints stuff to screen
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f,
+				FColor::Yellow, FString::Printf(TEXT("GridWidth equals %d"),
+					UnitsLeftToBeSummoned), true);
 		/*
 		* Units are placed by the players in subsequent order on their chosen "Starting Locations"
 		* inside the area of the gameplay board.
@@ -288,50 +294,26 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 
 
-/*
-void AGameplayManager::SimpleAutomaticTests()
-{
-	if (AutomaticTest == EAutomaticTestsList::EMPTY)
-	{
-		return;
-	}
-
-
-	if (AutomaticTest == EAutomaticTestsList::BASIC_UNIT_SETUP)
-	{
-		for (int32 i = 0; i < FMath::Max3(AttackerUnits.Num(), DefenderUnits.Num(), 0); i++)
-		{
-			if (i < AttackerUnits.Num())
-			{
-				InputListener(AttackerUnits[i]->CurrentCord);
-				InputListener(AttackerUnits[i]->CurrentCord + AttackerUnits[i]->Direction(0));
-			}
-			if (i < DefenderUnits.Num())
-			{
-				InputListener(DefenderUnits[i]->CurrentCord);
-				InputListener(DefenderUnits[i]->CurrentCord + DefenderUnits[i]->Direction(3));
-			}
-		}
-		return;
-	}
-}
-*/
 #pragma endregion
 
 
 
 #pragma region GameSetup
 
-
-
-void AGameplayManager::SetupGame()
+void AGameplayManager::GameSetup()
 {
-	//AHexGridManager::GenerateGrid();
-	//AHexGridManager::SpawnUnits();
+	AttackerUnitsAlive = AHexGridManager::AttackerUnits.Num();
+	DefenderUnitsAlive = AHexGridManager::DefenderUnits.Num();
 
-	//GetWorldTimerManager().SetTimer(TimerHandle, this, &AGameplayManager::TimerFunction, 1.0f, true, 0.5f);
-	//SimpleAutomaticTests();
+	UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;
+
+	CurrentPlayer = EPlayer::ATTACKER;
 }
+
+
+
+
+
 
 /*
 void AGameplayManager::TimerFunction()
@@ -354,16 +336,15 @@ void AGameplayManager::PostInitializeComponents()
 
 void AGameplayManager::BeginPlay()
 {
-	//SetupGame();
-	AttackerUnitsAlive = AHexGridManager::AttackerUnits.Num();
-	DefenderUnitsAlive = AHexGridManager::DefenderUnits.Num();
-	UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;
+	
+	
+
 }
 
 
 AGameplayManager::AGameplayManager()
 {
-	AutomaticTest = EAutomaticTestsList::EMPTY;
+	
 }
 
 #pragma endregion

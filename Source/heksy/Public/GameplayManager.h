@@ -19,15 +19,6 @@
 
 #include "GameplayManager.generated.h"
 
-UENUM()
-enum class EAutomaticTestsList : uint8  // __ why uint?
-{
-	INVALID,
-	EMPTY,
-	BASIC_UNIT_SETUP,
-	MAX UMETA(Hidden)  // __ ???
-};
-
 
 UCLASS()
 class HEKSY_API AGameplayManager : public AActor
@@ -38,18 +29,10 @@ protected:
 	static int32 UnitsLeftToBeSummoned;
 	static EPlayer CurrentPlayer;
 	static AUnit* SelectedUnit;
-
-	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")
-	EAutomaticTestsList UAutomaticTest;
-	
-	static EAutomaticTestsList AutomaticTest;
-
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override; 
-
-	static void SimpleAutomaticTests();
 
 	static bool SelectUnit(const FIntPoint& Cord);
 
@@ -60,6 +43,8 @@ public:  // TODO: why all of those are public
 	static int32 DefenderUnitsAlive;
 
 	AGameplayManager();
+
+	static void GameSetup();
 
 	static void InputListener(FIntPoint Cord);
 

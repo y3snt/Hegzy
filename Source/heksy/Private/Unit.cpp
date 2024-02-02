@@ -114,8 +114,10 @@ bool AUnit::CanAttack()
 	return AttackSymbols.Find(GetFrontSymbol()) != INDEX_NONE;
 	*/
 
-	//!if(Cast<IAction>(GetFrontSymbol()))  // currently all action symbols can attack
-		//return true;
+	IAction* Symbol = Cast<IAction>(GetFrontSymbol());
+
+	if(Symbol)  // currently all action symbols can attack
+		return true;
 	
 	return false;
 }
@@ -129,6 +131,8 @@ bool AUnit::CanDefend(int32 Side, ESymbols AttackerSymbol)
 	 * @param Side of a Unit, from which it could perform a block
 	 * @return true if can block
 	 */
+	
+	if(!GetSymbol(Side)) return false;
 	
 	ESymbols Symbol = GetSymbol(Side)->ToEnum();
 	if (Symbol == ESymbols::SHIELD && AttackerSymbol != ESymbols::PUSH)  // Does Unit have a shield?
@@ -154,20 +158,20 @@ void AUnit::Action()
 {
 	for (int32 side = 0; side < 6; side++)
 	{
-		ASymbol* Symbol = GetSymbol(side);
+		IAction* Symbol = Cast<IAction>(GetSymbol(side));
 
-		//if(Cast<IAction>(Symbol))
-		//	Symbol.Action(this, side);
+		if(Symbol)
+			Symbol->Action(this, side);
 
 	}
 }
 
 void AUnit::PassiveAction(int32 Side)
 {
-	ASymbol* Symbol = GetSymbol(Side);
+	IPassiveAction* Symbol = Cast<IPassiveAction>(GetSymbol(Side));
 
-	//if(Cast<IPassiveAction>(Symbol))
-	//	Symbol.PassiveAction(this, Side);
+	if(Symbol)
+		Symbol->PassiveAction(this, Side);
 }
 
 /**

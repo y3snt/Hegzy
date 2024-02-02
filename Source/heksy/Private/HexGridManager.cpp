@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "HexGridManager.h"
+#include "GameplayManager.h"
 
 // static members declaration
 const TArray<FIntPoint> AHexGridManager::Directions = {
@@ -398,8 +399,10 @@ void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	AGameplayManager::GameSetup();
 	GenerateGrid();
 	SpawnUnits();
+	SimpleAutomaticTests();
 }
 
 // Sets default values
@@ -409,6 +412,36 @@ AHexGridManager::AHexGridManager()
 	GridHeight = 5;
 
 	BorderSize = 1;
+
+	AutomaticTest = EAutomaticTestsList::EMPTY;
+}
+
+
+void AHexGridManager::SimpleAutomaticTests()
+{
+	if (AutomaticTest == EAutomaticTestsList::EMPTY)
+	{
+		return;
+	}
+
+
+	if (AutomaticTest == EAutomaticTestsList::BASIC_UNIT_SETUP)
+	{
+		for (int32 i = 0; i < FMath::Max3(AttackerUnits.Num(), DefenderUnits.Num(), 0); i++)
+		{
+			if (i < AttackerUnits.Num())
+			{
+				AGameplayManager::InputListener(AttackerUnits[i]->CurrentCord);
+				AGameplayManager::InputListener(AttackerUnits[i]->CurrentCord + AttackerUnits[i]->Direction(0));
+			}
+			if (i < DefenderUnits.Num())
+			{
+				AGameplayManager::InputListener(DefenderUnits[i]->CurrentCord);
+				AGameplayManager::InputListener(DefenderUnits[i]->CurrentCord + DefenderUnits[i]->Direction(3));
+			}
+		}
+		return;
+	}
 }
 
 #pragma endregion

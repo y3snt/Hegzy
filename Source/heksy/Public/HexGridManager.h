@@ -15,6 +15,15 @@
 #include "HexGridManager.generated.h"
 
 
+UENUM()
+enum class EAutomaticTestsList : uint8  // __ why uint?
+{
+	INVALID,
+	EMPTY,
+	BASIC_UNIT_SETUP,
+	MAX UMETA(Hidden)  // __ ???
+};
+
 
 
 UCLASS()
@@ -78,6 +87,10 @@ private:
 	static TSubclassOf<AHexTile> GetTileToSpawn(const int32 x, const int32 y, bool bOddRow);
 
 public:
+	UPROPERTY(EditAnywhere, Category = "AutomaticTests|Basic")
+	EAutomaticTestsList AutomaticTest;
+
+
 	static TArray<AHexTile*> DefenderTiles;  // TODO: move to protected
 	static TArray<AHexTile*> AttackerTiles;  // TODO: move to protected
 	static TArray<TArray<AUnit*>> UnitGrid;  // pointers to units on hex grid
@@ -91,6 +104,7 @@ public:
 	static TArray<AUnit*> AttackerUnits;
 
 	static void SpawnUnits();
+	void SimpleAutomaticTests();
 
 	AHexGridManager();
 

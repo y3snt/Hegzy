@@ -10,7 +10,6 @@
 //#include "HexGridManager.h"
 
 
-
 //#include "HegzyEvents.h"
 
 //#include "HegzEvent.cpp" //aa
@@ -21,6 +20,7 @@
 #include "Unit.generated.h"
 
 class ASymbol;
+class ASword;
 
 class UStaticMeshComponent;
 
@@ -100,7 +100,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	UPROPERTY(EditAnywhere, Category = "UNIT|Statistics")
 	TArray<ASymbol*> Symbols;
 	//TArray<ESymbols> Symbols;
 
