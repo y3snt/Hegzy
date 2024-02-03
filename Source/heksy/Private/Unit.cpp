@@ -3,6 +3,7 @@
 
 #include "Unit.h"
 #include "GameplayManager.h"
+#include "HexGridManager.h"
 #include "Symbol.h"
 
 // Called when the game starts or when spawned
@@ -148,7 +149,8 @@ void AUnit::Damage(int32 AttackSide, ESymbols AttackerSymbol)
 	 * 
 	 * @param AttackSide
 	 */
-	if(!CanDefend(AttackSide + 3, AttackerSymbol)) {
+	int32 UnitSide = AHexGridManager::AdjacentCordSide(AttackSide); 
+	if(!CanDefend(UnitSide, AttackerSymbol)) {
 		AGameplayManager::KillUnit(this);
 	}
 

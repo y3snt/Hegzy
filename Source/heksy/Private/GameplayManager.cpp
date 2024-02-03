@@ -167,10 +167,6 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
 	{
-		if (GEngine) // prints stuff to screen
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f,
-				FColor::Yellow, FString::Printf(TEXT("GridWidth equals %d"),
-					UnitsLeftToBeSummoned), true);
 		/*
 		* Units are placed by the players in subsequent order on their chosen "Starting Locations"
 		* inside the area of the gameplay board.
