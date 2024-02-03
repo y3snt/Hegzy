@@ -1,3 +1,8 @@
+/*****************************************************************//**
+ * \file   Unit.h
+ * \brief  Key class representing gameplay Units
+ * 
+ *********************************************************************/
 #pragma once
 
 #include "CoreMinimal.h"

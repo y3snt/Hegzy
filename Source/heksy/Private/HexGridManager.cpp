@@ -1,4 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*****************************************************************//**
+ * \file   HexGridManager.cpp
+ * \brief  
+ * 
+ *********************************************************************/
 
 #include "HexGridManager.h"
 #include "GameplayManager.h"

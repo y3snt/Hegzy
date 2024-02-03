@@ -1,8 +1,9 @@
-/**
- * Main Class of the Hegzy Project, which manages whole gameplay
+/*****************************************************************//**
+ * \file   GameplayManager.h
+ * \brief  Main Class of the Hegzy Project, which manages gameplay
  * It awaits Input System to call "InputListerner(Cord)".
  * and selects/moves/summons Units, based on a selected cord
- */
+ *********************************************************************/
 
 #pragma once
 
@@ -61,7 +62,7 @@ protected:
 	static void CheckWin();
 
 public:
-	AGameplayManager();
+	AGameplayManager(); // INIT
 
 	/**
 	 * Initialize values of a GameplayManager

@@ -1,4 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*****************************************************************//**
+ * \file   HexTile.cpp
+ * \brief  Init constuctor for Actor inside Unreal Engine
+ * 
+ *********************************************************************/
 
 
 #include "HexTile.h"

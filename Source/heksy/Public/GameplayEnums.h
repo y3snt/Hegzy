@@ -1,15 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*****************************************************************//**
+ * \file   GameplayEnums.h
+ * \brief  List of Enums used in gameplay throught the project
+ *********************************************************************/
 #pragma once
 
 #include "CoreMinimal.h"
 
-/**
- * 
- */
 
-
-//typedef GameplayEnums::EPlayer EPlayer;
 
 UENUM()
 enum class EHexTileType : uint8  // __ why uint?
@@ -44,16 +41,3 @@ enum class ESymbols : uint8  // __ why uint?
 	MAX UMETA(Hidden)  // __ ???
 };
 
-/*
-class HEKSY_API GameplayEnums
-{
-public:
-
-	
-
-
-
-	GameplayEnums();
-	~GameplayEnums();
-};
-*/

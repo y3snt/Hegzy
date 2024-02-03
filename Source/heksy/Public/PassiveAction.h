@@ -1,5 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*****************************************************************//**
+ * \file   PassiveAction.h
+ * \brief  Symbol
+ * 
+ *********************************************************************/
 #pragma once
 
 #include "CoreMinimal.h"

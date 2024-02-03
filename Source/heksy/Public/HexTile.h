@@ -1,5 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*****************************************************************//**
+ * \file   HexTile.h
+ * \brief  Basic board element, holds several metric about its own position.
+ * 
 
+ *********************************************************************/
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,35 +15,22 @@
 
 class UStaticMeshComponent;
 
-/*
-UENUM()
-enum class EHexTileType : uint8  // __ why uint?
+
+UCLASS()  
+class HEKSY_API AHexTile : public AActor
 {
-	INVALID,
-	GRASS,   // TODO: change to proper naming like: DEFAULT, SPAWN_1
-	WATER,
-	MAX UMETA(Hidden)  // __ ???
-};
-*/
-UCLASS()  // __ ???
-class HEKSY_API AHexTile : public AActor   // __ why HEKSY_API 
-{
-	GENERATED_BODY()   // __ ???
+	GENERATED_BODY()
 
 public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile")
-	FIntPoint TileIndex;
+	FIntPoint TileIndex;  // Tile Cords
 
 
 	EHexTileType TileType;   // logical tile type
 protected:
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")  // U: property, that will be visible in the editor
-	
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	UStaticMeshComponent *TileMesh;  // U: visible mesh
 
 public:
-	// Sets default values for this actor's properties
-	AHexTile();
+	AHexTile(); // INIT
 };

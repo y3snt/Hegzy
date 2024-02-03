@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*****************************************************************//**
+ * \file   Sword.h
+ * \brief  Symbol
+ * 
+ *********************************************************************/
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Symbol.h"
 #include "Sword.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class HEKSY_API ASword : public ASymbol, public IAction
 {

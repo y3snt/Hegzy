@@ -1,4 +1,9 @@
-﻿#include "GameplayManager.h"
+﻿/*****************************************************************//**
+ * \file   GameplayManager.cpp
+ * \brief  
+ * 
+ *********************************************************************/
+#include "GameplayManager.h"
 #include "Symbol.h"
 
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
@@ -129,7 +134,8 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	}
 	else  // Gameplay phase
 	{
-		Gameplay(Cord);
+		if (AHexGridManager::GetTileType(Cord) != EHexTileType::SENTINEL)
+			Gameplay(Cord);
 	}
 
 	SelectedUnit = nullptr;  // IMPORTANT

@@ -1,4 +1,9 @@
-﻿#include "Unit.h"
+﻿/*****************************************************************//**
+ * \file   Unit.cpp
+ * \brief  Unit init for Actor consturction + smaller functions for gameplay usage
+ * 
+ *********************************************************************/
+#include "Unit.h"
 #include "GameplayManager.h"
 #include "HexGridManager.h"
 #include "Symbol.h"

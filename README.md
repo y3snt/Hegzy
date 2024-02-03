@@ -1,47 +1,49 @@
 # Hegzy
-![](readmeImages/map.png)
-
-**Gra turowa, umiejscowiona na planszy heksagonalnej. W której dwóch graczy naprzemiennie przesuwa jednostki w celu zabicia dru?yny przeciwnej.**
-
-Gra utworzona zosta?a w ramach projektów ko?owych na KNTG poligon, semestr 2018Z
-
-## Autorzy ##
-+ @?M?ody - pomys?, mechaniki gry, grafika
-+ @?bartek7777 - programowanie
+**Turn based game, set on hexagonal board. The goal of two opposing players is to eliminate the opponents units.**
 
 
-Nale?y podkre?li?, ?e w obecnej wersji gra cechuje si? ograniczon? funkcjonalno?ci?. Reprezentuje ona podstawowe mechaniki trybu bitewnego, ale nie zawiera ca?ego zbioru planowanych rozwi?za?.
+## Authors ##
++ @ Wiolarz
++ @ y3snt
 
-Jednostk? reprezentuje sze?cioboczny „?eton” przedstawiaj?cy rysunek jednostki oraz zestaw symboli na poszczególnych bokach.
 
-![](readmeImages/unit.png)
+Units are represented as tokens with visible art and a set of special "Symbols" on sides.
 
-###### Obrót i Ruch  ######
-Mechanika poruszania si? jednostek po polu bitwy. Najpierw gracz wybiera przyleg?e *dost?pne (wolne)* pole a ?eton zostaje obrócony w kierunku ruchu.
-Sam obrót (nawet w przypadku gdy jednostka ju? wcze?niej by?a obrócona w kierunku ruchu to i tak ten moment jest traktowany jako faza obrotu.
 
-###### Wolne Pole  ######
-Jest to ka?de pole nieb?d?ce: ko?cem mapy, przeszkod? terenow?, sojusznicz? jednostk?. Pole z przeciwnikiem traktujemy jako wolne, je?eli ruch, b?dzie skutkowa? usuni?ciem b?d? przesuni?ciem wroga.
+###### Starting Placement  ######
+Players in subsequent turns place their units on their starting positions.
+Starting with the Elves faction, Player selects one of his units then chooses one of the starting tiles near his edge of the board.
+After all units are placed the game begins with the Elven player making the first move.
+
+###### Movement  ######
+Everything in the game revolves around the basic move of the unit.
+To perform the move active players selects one of his units the chooses a tile next to it which is either:
+
+- free
+- occupied by the enemy unit with the exception of the scenario in which that enemy unit has a shield pointed at the selected unit.
+
+Then the selected unit first:
+Rotates toward the target location
+It's symbols are "Activated"
+Then the unit moves to the target location.
+And for the last time its symbols are activated once again.
 
 ###### Symbole  ######
-G?ówna mechanika gry reprezentuj?ca umiej?tno?ci jednostki w walce. Symbol zawsze jest umieszczony na poszczególnym boku oznaczaj?cym kierunek.
-Symbole dzielimy na dwa rodzaje: *Pasywne* (dzia?aj? w ka?dym momencie) i *Aktywne* (aktywuj? si? podczas: *Obrotu* i *ruchu*). Dzia?anie symbolu nazywane jest *efektem*.
-Efekty dzia?aj? w dwóch stanach: pasywnym i aktywnym.
-Kiedy jednostka stoi nieruchomo, jej efekty s? w stanie pasywnym. Cz??? efektów dzia?a jedynie w stanie pasywnym. Efekty dzia?aj? na przyleg?e pola wskazane przez symbol przy okre?lonym boku. 
-###### Efekty  ######
-Efekty aktywne aktywowane zostaj? podczas ruchu dwukrotnie: pierwszy raz w momencie, gdy jednostka obraca si? w kierunku ruchu i drugi raz momencie przej?cia na dane pole.
-	Kiedy jednostka si? obraca, przed jej efektami najpierw aktywuj? si? efekty dzia?aj?ce na jej pole.
+Main way to kill enemy units is with the "Symbols" at the edges of your units.
+Their effect most of the time affects the unit standing right next to it, with the exception of a bow.
+We split symbols into 2 categories based on if they work only during the movement of the unit carrying them "ACTIVE".
+Or if they work all the time "PASSIVE"
 
-Gracze naprzemiennie wykonuj? swoje tury, a? jedna ze stron nie b?dzie mia?a jednostek. Strona ta przegrywa, a jej przeciwnik odnosi zwyci?stwo.
+Active Symbols:
 
-###### Zaimplementowane efekty ######
-+ ![](readmeImages/Symbol_Spear.png) **W?ócznia** w stanie akrywnym i pasywnym zabija ka?d? jednostk? znajduj?c? si? na przyleg?ym boku.
-+ ![](readmeImages/Symbol_Sword.png) **Miecz** w stanie aktywnym zabija ka?d? jednostk? na przyleg?ym boku. 
-+ ![](readmeImages/Symbol_Shield.png) **Tarcza** blokuje obra?enie (zniszczenie jednostki) od strony tarczy. 
-+ ![](readmeImages/Symbol_Arrow.png) **?uk** w stanie aktywnym wystrzeliwuje pocisk który porusza si? w linii prostej i po natrafieniu na wroga nieos?oni?tego tarcz? zabija go i ko?czy swój “lot”.
-+ ![](readmeImages/Symbol_Axe.png) **Topór** w stanie aktywnym wystrzeliwuje pocisk który porusza si? w linii prostej **na odleg?o?? najwy?ej dwóch pól** i po natrafieniu na wroga nieos?oni?tego tarcz? zabija go i ko?czy swój “lot”.
-+ ![](readmeImages/Symbol_Push.png) **Odepchni?cie** ignoruj?c tarcze, aktywnie *odpycha* (przesuwa w kierunku naprzeciwleg?y od jednostki aktywnej) wrogie jednostki. Je?eli taka jednostka natrafi na dowolne zaj?te pole lub kraniec mapy, to umiera.
-+ ![](readmeImages/Symbol_Hook.png) **Hak** - je?eli 
-+ + wroga jednostka znajduje si? w odleg?o?ci od dwóch do trzech pól
-+ + pola mi?dzy ni? a postaci? aktywn? s? puste
-+  to posta? zostaje przesuni?ta do pola s?siedniego w stosunku do jednostki aktywnej. Pozwoli? to mo?e do "nadziania" wrogiej jednostki na np w?ócznie.
+Sword - "Sword" Kills enemy units on an adjacent tile.
+ARROW - "Bow" Shoots an arrow that damages the first encountered enemy unit. If the path is blocked by the ally unit, the arrow doesn't travel further.
+CIRCLE - "Fist" Pushes enemy unit 1 tile away, if that tile isn't empty or is outside the gameplay area the pushed unit is killed. It's possible to push an enemy unit on top of a tile covered by your spear, in that case the pushed unit is killed. This symbol ignores the shield.
+
+Passive Symbols:
+
+CROSS	- "Spear" Kills any enemy unit that enters this tile. Spear acts before any enemy unit symbol does (except for a shield). If a unit protected by a shield rotates at the start of its movement while this shield is covering the spear, and at its final rotation position the spear can hit the unit rotation ends with the unit death.
+TRIANGLE - "Shield" nullifies sources of damage (doesn't work against push)
+
+
+######   ######

@@ -1,20 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+/*****************************************************************//**
+ * \file   GameplayEnums.cpp
+ * \brief  Empty File
+ * 
+ *********************************************************************/
 #include "GameplayEnums.h"
 
 
 
-
-
-/*
-
-
-GameplayEnums::GameplayEnums()
-{
-}
-
-GameplayEnums::~GameplayEnums()
-{
-}
-*/

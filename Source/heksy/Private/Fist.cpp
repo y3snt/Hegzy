@@ -1,4 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*****************************************************************//**
+ * \file   Fist.cpp
+ * \brief  
+ * 
+ *********************************************************************/
 #include "Fist.h"
 #include "Effects.h"
 
