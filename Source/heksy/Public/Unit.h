@@ -1,156 +1,106 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 
 #include "GameplayEnums.h"
-//#include "GameplayConstants.h"
-//#include "HexGridManager.h"
-
-
-//#include "HegzyEvents.h"
-
-//#include "HegzEvent.cpp" //aa
-
-
-//#include "C:/Users/tomek/Documents/GitHub/CPP/Heksy   /Plugins/2D/Paper2D/Source/Paper2D/Classes/PaperSpriteComponent.h�
 
 #include "Unit.generated.h"
 
 class ASymbol;
-class ASword;
-
 class UStaticMeshComponent;
-
-class UPaperSpriteComponent;
 
 UCLASS()
 class HEKSY_API AUnit : public APawn
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Model")
+	UStaticMeshComponent *UnitMesh;  // visible mesh
 
-	TArray<FIntPoint> Directions = {
-			FIntPoint(1, 0),
-			FIntPoint(0, 1),
-			FIntPoint(-1, 1),
-			FIntPoint(-1, 0),
-			FIntPoint(0, -1),
-			FIntPoint(1, -1) };
-
-
-	// Sets default values for this pawn's properties
-	AUnit();
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	FIntPoint CurrentCord;
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
 	int32 CurrentRotation;
 
-	EPlayer Controller;
+	UPROPERTY(EditAnywhere, Category = "UNIT|Statistics")
+	TArray<ASymbol*> Symbols;
 
-	//TODO add some kind of refference or TAG to set which team unit is a member of
-	FIntPoint Neighbour(int32 Direction);
-	//void SetCurrentCord(const FIntPoint& Cord);
-
-	void Move(const FIntPoint& EndCord);
-
-	
-
-
-protected:
-#pragma region UnitSymbols
-
-	
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	//TArray<ASymbol*> Symbols;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")  // U: property, that will be visible in the editor
-	TSubclassOf <ASymbol> FrontSymbol;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TSubclassOf<ASymbol> FrontRightSymbol;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TSubclassOf<ASymbol> FrontLeftSymbol;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")  // U: property, that will be visible in the editor
-	TSubclassOf<ASymbol> BackSymbol;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TSubclassOf<ASymbol> BackRightSymbol;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
-	TSubclassOf<ASymbol> BackLeftSymbol;
-
-#pragma endregion
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Model")
-	UStaticMeshComponent *UnitMesh;  // U: visible mesh
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UNIT|Model")
-	//UPaperSpriteComponent *UnitSprite;  // U: visible mesh
-
-
-
-	// Called when the game starts or when spawned
+	/* Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnywhere, Category = "UNIT|Statistics")
-	TArray<ASymbol*> Symbols;
-	//TArray<ESymbols> Symbols;
+	EPlayer Controller;  // who owns the Unit
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "UNIT|Statistics")
+	FIntPoint CurrentCord;  // on which cord Unit is currently placed
 
-//	static FIntPoint Direction(int32 Side); //TODO think about how to make it static
+	AUnit();
 
-	static FIntPoint Direction(int32 Side)
-	{
-		TArray<FIntPoint> Directions = {
-			FIntPoint(1, 0),
-			FIntPoint(0, 1),
-			FIntPoint(-1, 1),
-			FIntPoint(-1, 0),
-			FIntPoint(0, -1),
-			FIntPoint(1, -1) };
-		return Directions[Side];
-	}
-
-	static int32 DirectionToSide(FIntPoint Direction)  // TODO: MOVE THIS SOMEWHERE
-	{
-		
-		TArray<FIntPoint> Directions = {
-			FIntPoint(1, 0),
-			FIntPoint(0, 1),
-			FIntPoint(-1, 1),
-			FIntPoint(-1, 0),
-			FIntPoint(0, -1),
-			FIntPoint(1, -1) };
-			
-		//int32 Index;
-		//directions.Find(TEXT("Hello"), Index)
-
-		//return Index;
-		return Directions.IndexOfByKey(Direction);
-	}
-
+	/* Called to bind functionality to input */
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	/**
+	 * Rotate the unit towards Side
+	 * 
+	 * @param Side {0, 1, ..., 5}
+	 * @note this is an absolute rotation (not based on current rotation of the unit)
+	 */
 	void Rotate(int32 Side);
 
-	ASymbol* GetSymbol(int32 side);
+	/**
+	 * Get the Symbol on a given Side of Unit
+	 * 
+	 * @param side absolute side of a hex tile
+	 * @return ASymbol* 
+	 * 
+	 * @note converts absolute hex side to loacal unit side (applying unit rotation)
+	 */
+	ASymbol* GetSymbol(int32 Side);
+
+	/**
+	 * Get Symbol on a front of the Unit
+	 * 
+	 * @return ESymbols
+	 */
 	ASymbol* GetFrontSymbol();
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	/**
+	 * Return true if Unit can block action from given Side
+	 * 
+	 * @param Side of a Unit, from which it could perform a block
+	 * @param AttackerSymbol 
+	 * @return true if Unit can block AttackerSymbol
+	 * @return false otherwise
+	 */
 	bool CanDefend(int32 Side, ESymbols AttackerSymbol = ESymbols::INVALID);
-	void Damage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::INVALID);
-	void Action();
-	void PassiveAction(int32 Side);
 
+	/**
+	 * Return true if Unit can perform an attack from the front side
+	 * 
+	 * @return true if can attack
+	 * @note returns true if action performed by the Unit can kill or move an enemy
+	 */
 	bool CanAttack();
+
+	/**
+	 * Take damage from AttackSide, if cannot defend - dies
+	 * 
+	 * @param AttackSide 
+	 * @param AttackerSymbol 
+	 */
+	void Damage(int32 AttackSide, ESymbols AttackerSymbol = ESymbols::INVALID);
+
+	/**
+	 * Perform Actions of all Symbols that belongs to the unit
+	 */
+	void Action();
+
+	/**
+	 * Perform PassiveAction of a Symbol on given side of the Unit
+	 * 
+	 * @param Side 
+	 * @note if there is no Passive Symbol on the Side, no action is performed
+	 */
+	void PassiveAction(int32 Side);
 
 };

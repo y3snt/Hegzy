@@ -112,7 +112,6 @@ public:
 	static AUnit* GetUnit(const FIntPoint& Cord);
 	
 	static void ChangeUnitPosition(AUnit* Unit, const FIntPoint& Cord);
-	static void RotateUnit(AUnit* Unit, int32 Side);
 
 	static bool IsAdjacent(const FIntPoint& Cord1, const FIntPoint& Cord2);
 	static int32 AdjacentSide(const FIntPoint& Cord1, const FIntPoint& Cord2); // Rename to shared side

@@ -4,13 +4,15 @@
 #include "GameplayManager.h"
 
 // static members declaration
-const TArray<FIntPoint> AHexGridManager::Directions = {
+const TArray<FIntPoint> AHexGridManager::Directions = 
+{  // order is important
 	FIntPoint(1, 0),
 	FIntPoint(0, 1),
 	FIntPoint(-1, 1),
 	FIntPoint(-1, 0),
 	FIntPoint(0, -1),
-	FIntPoint(1, -1)};
+	FIntPoint(1, -1)
+};
 
 EHexTileType AHexGridManager::current_spawn = EHexTileType::SENTINEL;
 
@@ -53,18 +55,6 @@ void AHexGridManager::ChangeUnitPosition(AUnit *Unit, const FIntPoint &Cord)
 	Unit->CurrentCord = Cord; // update Unit Index
 
 	Unit->SetActorLocation(HexGrid[Cord.X][Cord.Y]->GetActorLocation()); // Move visuals of the unit
-}
-
-void AHexGridManager::RotateUnit(AUnit *Unit, int32 Direction)
-{
-	/**
-	 * 360 / 6 = 60 -> degrees needed to rotate unit
-	 *
-	 * \param Unit - Reference to the object we are rotating
-	 */
-	Unit->CurrentRotation = Direction;
-	// "Direction + 4" Accounts for global rotation setting for objects in the level
-	Unit->SetActorRotation(FRotator(0, 60 * (Direction + 4), 0), ETeleportType::TeleportPhysics);
 }
 
 void AHexGridManager::RemoveUnit(AUnit *Unit)
@@ -179,20 +169,6 @@ int32 AHexGridManager::AdjacentCordSide(int32 Side)
 
 	return (Side + 3) % 6;
 }
-
-/* Maybe TODO
-FIntPoint AHexGridManager::AdjacentCord(const FIntPoint& BaseCord, const FIntPoint& Direction)
-{
-	/**
-	 * Return cord adjacent to BaseCord at given Direction
-	 *
-	 * @param BaseCord
-	 * @param Side {0, 1, ..., 5}
-	 * @return FIntPoint Cord adjacent to BaseCord
-	 */
-// TODO: Normalize dircetion first to match one of the Directions
-// return BaseCord + Directions[Side];
-//}
 
 #pragma endregion
 
@@ -340,7 +316,6 @@ void AHexGridManager::SpawnUnits()
 
 		FIntPoint SpawnCord = AttackerTiles[i]->TileIndex; // Get spawn location
 		SpawnCord += Directions[3];  // Move to a spot outside of the map near spawn point
-		//SpawnCord += AUnit::Direction(3);
 
 		ChangeUnitPosition(AttackerUnits[i], SpawnCord); // Adding Unit to the Gameplay Array
 		
@@ -432,12 +407,12 @@ void AHexGridManager::SimpleAutomaticTests()
 			if (i < AttackerUnits.Num())
 			{
 				AGameplayManager::InputListener(AttackerUnits[i]->CurrentCord);
-				AGameplayManager::InputListener(AttackerUnits[i]->CurrentCord + AttackerUnits[i]->Direction(0));
+				AGameplayManager::InputListener(AttackerUnits[i]->CurrentCord + Directions[0]);
 			}
 			if (i < DefenderUnits.Num())
 			{
 				AGameplayManager::InputListener(DefenderUnits[i]->CurrentCord);
-				AGameplayManager::InputListener(DefenderUnits[i]->CurrentCord + DefenderUnits[i]->Direction(3));
+				AGameplayManager::InputListener(DefenderUnits[i]->CurrentCord + Directions[3]);
 			}
 		}
 		return;

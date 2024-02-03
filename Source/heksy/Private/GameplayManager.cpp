@@ -1,20 +1,9 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-/**
- * Main Class of the Hegzy Project.
- * It generates neccesary values at the start of the level in BeginPlay()
- *  then await Input System to call "InputListerner(FIntPoint Cord)".
- * 
- * GameplayManager depends on the Unit.h and HexGridManager.h
- * //Unit - is the next layer of the architecture dealing with smaller and more detailed gameplay systems
- * GridManager - is a tool used to manage the map
- */
-
-
-#include "GameplayManager.h"
+﻿#include "GameplayManager.h"
 #include "Symbol.h"
 
 #define PrintString(String) GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::White, String)
+
+#pragma region StaticMembers
 
 int32 AGameplayManager::UnitsLeftToBeSummoned;
 EPlayer AGameplayManager::CurrentPlayer;
@@ -22,6 +11,8 @@ EPlayer AGameplayManager::CurrentPlayer;
 AUnit* AGameplayManager::SelectedUnit = nullptr;
 int32 AGameplayManager::AttackerUnitsAlive = 0;
 int32 AGameplayManager::DefenderUnitsAlive = 0;
+
+#pragma endregion
 
 
 #pragma region Tools
@@ -33,33 +24,22 @@ void AGameplayManager::SwitchPlayerTurn()
 
 bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 {
-	/**
-	 * Check if SelectedUnit can move to a given cord
-	 * 
-	 * @param Cord
-	 * @return true if selected Unit can move on a given Cord
-	 * @note If a Cord is adjacent, ajdacent side will be assigned in ResultSide
-	 */
-
-	// Target Cord doesn't contatin an Enemy Unit with a shield pointing at our SelectedUnit
-
-	// Check if Cord is a neighbour of a SelectedUnit
-	// TODO: ? move to listener, so only tiles adj to current unit can be selected in gameplay phase
+	// Check if Cord is adjacent to SelectedUnit
 	ResultSide = AHexGridManager::AdjacentSide(SelectedUnit->CurrentCord, Cord);  
 	if (ResultSide == INDEX_NONE)
 		return false;
 
-	// TODO: Check if SelectedUnit doesn't have push symbol on it's front (none currently have it yet)
+	// Check if there no Unit in this spot
 	AUnit* EnemyUnit = AHexGridManager::GetUnit(Cord);
-	if (EnemyUnit == nullptr)  // Is there a Unit in this spot?
+	if (EnemyUnit == nullptr)
 		return true;
 
-	// checking if can attack from the front, cause SelectedUnit will rotate first
-	
+	// Check if SelectedUnit can attack from the front, cause SelectedUnit will rotate before attacking
 	int32 EnemySide = AHexGridManager::AdjacentCordSide(ResultSide);
 	ASymbol* AttackSymbolPointer = SelectedUnit->GetFrontSymbol();
 
-	if(AttackSymbolPointer == nullptr) return false;
+	if(AttackSymbolPointer == nullptr) 
+		return false;
 
 	ESymbols AttackSymbol = AttackSymbolPointer->ToEnum();
 
@@ -69,34 +49,19 @@ bool AGameplayManager::IsLegalMove(FIntPoint Cord, int32& ResultSide)
 	return true;
 }
 
-
-/* TODO
-1 Action
-2 Check for Spear Damage
-3 Check for shield in IsLegalMove
-*/
-
-
-void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 side)
+void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 Side)
 { 
-	// Move General function
-	/**
-	 * Move this unit to EndCord
-	 *
-	 * @param EndCord Position at which unit will be placed
-	 */
-
-	SelectedUnit->Rotate(side); // 1
+	SelectedUnit->Rotate(Side);
 
 	EnemyDamage(SelectedUnit);
-	if(SelectedUnit == nullptr) return;  // unit wass killed
+	if(SelectedUnit == nullptr) return;  // unit was killed
 
 	SelectedUnit->Action();
 
 	AHexGridManager::ChangeUnitPosition(SelectedUnit, EndCord);
 
 	EnemyDamage(SelectedUnit);
-	if(SelectedUnit == nullptr) return;  // unit wass killed
+	if(SelectedUnit == nullptr) return;  // unit was killed
 
 	SelectedUnit->Action();
 
@@ -146,9 +111,6 @@ void AGameplayManager::CheckWin() {
 	else if (AttackerUnitsAlive == 0)
 		PrintString("Defender won");
 }
-
-
-// maybe CanDefend(attacking side) vs HasDefense(unit side)
 
 #pragma endregion
 
@@ -207,28 +169,10 @@ void AGameplayManager::Gameplay(FIntPoint Cord)
 {
 	PrintString("Gameplay is working");
 
-	int32 side;  // Gets Updated with IsLegalMove()
-	if (IsLegalMove(Cord, side)) // spot is empty + we aren't hitting a shield
+	int32 Side;  // Gets Updated with IsLegalMove()
+	if (IsLegalMove(Cord, Side))
 	{
-		// 1 Rotate
-
-		// 2 Check for Spear
-
-		// 3 Actions
-
-		// 4 Move
-
-		// 5 Check for Spear
-
-		// 6 Actions
-		MoveUnit(Cord, side);
-		//PrintString(FString::Printf(TEXT("DIRECTION_%d"), side));
-		//testKillUnit(Cord);
-		
-		//AHexGridManager::ChangeUnitPosition(SelectedUnit, Cord);
-		//PrintString(FString::Printf(TEXT("_%d"), side));
-		//->RotateUnit(SelectedUnit, side);
-
+		MoveUnit(Cord, Side);
 		SwitchPlayerTurn();
 	}
 
