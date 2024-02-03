@@ -14,9 +14,6 @@ int32 AGameplayManager::DefenderUnitsAlive = 0;
 
 #pragma endregion
 
-
-#pragma region Tools
-
 void AGameplayManager::SwitchPlayerTurn()
 { // Currently works only for 2 players
 	CurrentPlayer = (CurrentPlayer == EPlayer::ATTACKER) ? EPlayer::DEFENDER : EPlayer::ATTACKER;
@@ -54,22 +51,21 @@ void AGameplayManager::MoveUnit(const FIntPoint& EndCord, int32 Side)
 	SelectedUnit->Rotate(Side);
 
 	EnemyDamage(SelectedUnit);
-	if(SelectedUnit == nullptr) return;  // unit was killed
+	if(SelectedUnit == nullptr) return;  // unit has been killed
 
 	SelectedUnit->Action();
 
 	AHexGridManager::ChangeUnitPosition(SelectedUnit, EndCord);
 
 	EnemyDamage(SelectedUnit);
-	if(SelectedUnit == nullptr) return;  // unit was killed
+	if(SelectedUnit == nullptr) return;  // unit has been killed
 
 	SelectedUnit->Action();
 
 }
 
 void AGameplayManager::EnemyDamage(AUnit* Target)
-{ // Returns true is Enemy spear can kill the Target
-	// TODO: return true if Unit was killed; update in symbols (and in other classes)
+{
 	FIntPoint Cord = Target->CurrentCord;
 	TArray<AUnit* > Units = AHexGridManager::AdjacentUnits(Cord);
 	
@@ -105,27 +101,23 @@ void AGameplayManager::KillUnit(AUnit* Target)
 	
 }
 
-void AGameplayManager::CheckWin() {
+void AGameplayManager::CheckWin() 
+{
 	if (DefenderUnitsAlive == 0)
 		PrintString("Attacker won");
 	else if (AttackerUnitsAlive == 0)
 		PrintString("Defender won");
 }
 
-#pragma endregion
-
-
-#pragma region Main Functions
-
-
 void AGameplayManager::InputListener(FIntPoint Cord)
 {
 	FString output = Cord.ToString();
 	PrintString(output);
 
+	// selected a new unit - listen for next input
+	// or input was wrong and didn't select any ally unit
 	if(SelectUnit(Cord) || SelectedUnit == nullptr)
-		return; // selected a new unit || wrong input which didn't select any ally unit
-
+		return; 
 
 	if (UnitsLeftToBeSummoned > 0)  // Summon phase
 	{
@@ -143,14 +135,8 @@ void AGameplayManager::InputListener(FIntPoint Cord)
 	SelectedUnit = nullptr;  // IMPORTANT
 }
 
-
-bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
-	/**
-	 * Select friendly Unit on a given Cord
-	 * 
-	 * @return true if unit has been selected in this operation
-	 */
-
+bool AGameplayManager::SelectUnit(const FIntPoint& Cord) 
+{
 	AUnit* NewSelection = AHexGridManager::GetUnit(Cord);
 	if (NewSelection && NewSelection->Controller == CurrentPlayer)
 	{
@@ -162,7 +148,6 @@ bool AGameplayManager::SelectUnit(const FIntPoint& Cord) {
 
 	return false;
 }
-
 
 
 void AGameplayManager::Gameplay(FIntPoint Cord)
@@ -181,14 +166,6 @@ void AGameplayManager::Gameplay(FIntPoint Cord)
 
 void AGameplayManager::SummonUnit(FIntPoint Cord)
 {
-	/**
-	 * Summon currently selected unit to a Gameplay Board
-	 *
-	 *
-	 * @param Cord cordinate, on which Unit will be summoned
-	 */
-	
-
 	// check if unit is already summoned
 	EHexTileType SelectedUnitTileType = AHexGridManager::GetTileType(SelectedUnit->CurrentCord);  // todo getters/setters
 
@@ -198,7 +175,6 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 		return;
 	}
 
-
 	EHexTileType SelectedHexType = AHexGridManager::GetTileType(Cord);
 
 	bool bSelectedCurrentPlayerSpawn =
@@ -207,16 +183,15 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 	if (!bSelectedCurrentPlayerSpawn)
 	{
-		PrintString("Thats a wrong summon location");  // TODO: Don't reset SelectedUnit
+		PrintString("Thats a wrong summon location");
 		return;
 	}
 
 	PrintString("You summoned a Unit");
 
-	// TeleportUnit(Cord);
 	AHexGridManager::ChangeUnitPosition(SelectedUnit, Cord);
 
-	if (CurrentPlayer == EPlayer::ATTACKER)  // TODO: Move to setup
+	if (CurrentPlayer == EPlayer::ATTACKER) 
 		SelectedUnit->Rotate(0);
 	else
 		SelectedUnit->Rotate(3);
@@ -226,16 +201,6 @@ void AGameplayManager::SummonUnit(FIntPoint Cord)
 
 	UnitsLeftToBeSummoned--;
 }
-#pragma endregion
-
-#pragma region Tests
-
-
-
-
-
-#pragma endregion
-
 
 
 #pragma region GameSetup
@@ -250,41 +215,13 @@ void AGameplayManager::GameSetup()
 	CurrentPlayer = EPlayer::ATTACKER;
 }
 
-
-
-
-
-
-/*
-void AGameplayManager::TimerFunction()
-{
-	CallTracker--;
-	if (CallTracker == 0)
-	{
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-		SimpleAutomaticTests();
-	}
-}
-*/
-
 void AGameplayManager::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// UnitsLeftToBeSummoned = AttackerUnitsAlive + DefenderUnitsAlive;  // Flag that manages the state of the game
 }
 
+void AGameplayManager::BeginPlay() {}
 
-void AGameplayManager::BeginPlay()
-{
-	
-	
-
-}
-
-
-AGameplayManager::AGameplayManager()
-{
-	
-}
+AGameplayManager::AGameplayManager() {}
 
 #pragma endregion

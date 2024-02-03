@@ -44,6 +44,8 @@ private:
 	int32 UGridHeight;  // no tiles horizonally vertically
 	static int32 GridHeight;
 
+	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")
+	int32 UBorderSize;
 	static int32 BorderSize;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid|Layout")

@@ -350,8 +350,10 @@ void AHexGridManager::GenerateGrid()
 void AHexGridManager::PostInitializeComponents()
 { // PrintString, maybe in constructor?
 	Super::PostInitializeComponents();
+
 	GridWidth = UGridWidth;
 	GridHeight = UGridHeight;
+	BorderSize = (UBorderSize > 0) ? UBorderSize : 1;
 	OddRowHorizontalOffset = UOddRowHorizontalOffset;
 	TileHorizontalOffset = UTileHorizontalOffset;
 	TileVerticalOffset = UTileVerticalOffset;
@@ -385,8 +387,6 @@ AHexGridManager::AHexGridManager()
 {
 	GridWidth = 5;
 	GridHeight = 5;
-
-	BorderSize = 1;
 
 	AutomaticTest = EAutomaticTestsList::EMPTY;
 }
