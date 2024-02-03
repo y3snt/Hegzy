@@ -4,21 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Symbol.h"
-#include "Sword.generated.h"
+#include "Bow.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class HEKSY_API ASword : public ASymbol, public IAction
+class HEKSY_API ABow : public ASymbol, public IAction
 {
 	GENERATED_BODY()
 
 public:
-	ASword();
+	ABow();
 
 	virtual void Action(AUnit* Unit, int32 Side) override;
 	
 };
-
-

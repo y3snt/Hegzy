@@ -177,7 +177,7 @@ int32 AHexGridManager::AdjacentCordSide(int32 Side)
 	 * @return side number of a cord, which shares a side with a current cord
 	 */
 
-	return Side + 3;
+	return (Side + 3) % 6;
 }
 
 /* Maybe TODO

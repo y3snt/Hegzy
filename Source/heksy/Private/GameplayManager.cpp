@@ -112,7 +112,7 @@ void AGameplayManager::EnemyDamage(AUnit* Target)
 	{	
 		if (Units[side] && Units[side]->Controller != Target->Controller)
 		{	
-			int32 EnemySide = side + 3;
+			int32 EnemySide = AHexGridManager::AdjacentCordSide(side);
 			Units[side]->PassiveAction(EnemySide);
 
 			bool bTargetKilled = AHexGridManager::GetUnit(Cord) == nullptr;

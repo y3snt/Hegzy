@@ -8,7 +8,7 @@
 // Sets default values
 ASymbol::ASymbol()
 {
-
+	SymbolEnum = ESymbols::INVALID;
 }
 
 // Called when the game starts or when spawned
@@ -18,8 +18,14 @@ void ASymbol::BeginPlay()
 	
 }
 
-ESymbols ASymbol::ToEnum() {
+ESymbols ASymbol::ToEnum() 
+{
 	return SymbolEnum;
+}
+
+void ASymbol::SetSymbolEnum(ESymbols Symbol)
+{
+	SymbolEnum = Symbol;
 }
 
 // Sword.cpp
