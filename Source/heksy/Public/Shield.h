@@ -9,9 +9,6 @@
 #include "Symbol.h"
 #include "Shield.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class HEKSY_API AShield : public ASymbol
 {
@@ -19,5 +16,4 @@ class HEKSY_API AShield : public ASymbol
 
 public:
 	AShield();
-	
 };

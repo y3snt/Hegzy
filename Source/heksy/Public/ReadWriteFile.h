@@ -11,11 +11,6 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ReadWriteFile.generated.h"
 
-
-
-/**
- * 
- */
 UCLASS()
 class HEKSY_API UReadWriteFile : public UBlueprintFunctionLibrary
 {
@@ -32,7 +27,4 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "test|1 - Read Write File")
 	static void InputConnectListener(FIntPoint Cord, bool& bOutSuccess, FString& OutInfoMessage);
-
-
-	
 };

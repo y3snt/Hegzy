@@ -2,7 +2,6 @@
  * \file   HexTile.h
  * \brief  Basic board element, holds several metric about its own position.
  * 
-
  *********************************************************************/
 #pragma once
 
@@ -14,7 +13,6 @@
 #include "HexTile.generated.h"
 
 class UStaticMeshComponent;
-
 
 UCLASS()  
 class HEKSY_API AHexTile : public AActor

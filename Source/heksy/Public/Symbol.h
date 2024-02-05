@@ -14,7 +14,6 @@
 
 #include "Symbol.generated.h"
 
-//class AUnit;
 
 class UStaticMeshComponent;
 
@@ -37,5 +36,4 @@ protected:
 	
 private:
 	ESymbols SymbolEnum;
-
 };

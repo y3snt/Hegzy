@@ -18,9 +18,6 @@ class UPassiveAction : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class HEKSY_API IPassiveAction
 {
 	GENERATED_BODY()

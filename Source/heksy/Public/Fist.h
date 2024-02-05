@@ -9,9 +9,6 @@
 #include "Symbol.h"
 #include "Fist.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class HEKSY_API AFist : public ASymbol, public IAction
 {
@@ -21,5 +18,4 @@ public:
 	AFist();
 
 	virtual void Action(AUnit* Unit, int32 Side) override;
-	
 };

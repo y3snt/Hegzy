@@ -233,20 +233,20 @@ void AHexGridManager::SpawnTiles()
 
 			if (current_spawn == EHexTileType::SENTINEL)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Sentinel_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Sentinel_%d-%d"), x, y));
 			}
 			else if (current_spawn == EHexTileType::DEFAULT)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Default_%d-%d"), x, y));
 			}
 			else if (current_spawn == EHexTileType::ATTACKER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Attacker_Spawn_%d-%d"), x, y));
 				AttackerTiles.Add(newTile);
 			}
 			else if (current_spawn == EHexTileType::DEFENDER_SPAWN)
 			{
-				newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
+				//newTile->SetActorLabel(FString::Printf(TEXT("Tile_Defender_Spawn_%d-%d"), x, y));
 				DefenderTiles.Add(newTile);
 			}
 

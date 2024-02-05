@@ -17,9 +17,6 @@ class UAction : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class HEKSY_API IAction
 {
 	GENERATED_BODY()

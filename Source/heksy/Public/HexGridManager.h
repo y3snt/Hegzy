@@ -182,7 +182,6 @@ public:
 	 */
 	static int32 AdjacentCordSide(int32 Side);
 
-
 	/**
 	 * Get a reference to the first Unit hit by a bow.
 	 * 
@@ -236,7 +235,6 @@ public:
 	 * @param Unit
 	 */
 	static void RemoveUnit(AUnit* Unit);
-
 
 	/**
 	 * Main function that generates starting gameplay board.

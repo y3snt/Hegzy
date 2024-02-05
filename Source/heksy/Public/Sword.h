@@ -18,7 +18,4 @@ public:
 	ASword();
 
 	virtual void Action(AUnit* Unit, int32 Side) override;
-	
 };
-
-

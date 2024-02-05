@@ -10,9 +10,6 @@
 
 class AUnit;
 
-/**
- * 
- */
 class HEKSY_API Effects
 {
 public:
